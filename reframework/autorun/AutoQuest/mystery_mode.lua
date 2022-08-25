@@ -4,7 +4,6 @@ local singletons
 local config
 local vars
 
-local quest_board_update = false
 local quest_board_order_type_def = sdk.find_type_definition('snow.gui.QuestBoardOrder')
 local quest_board_order_fields = {}
 
@@ -59,12 +58,8 @@ function mystery_mode.hook()
 	            for _,field in pairs(quest_board_order_fields) do
 	            	 methods.text_set_message:call(quest_order_ctrl:get_field(field),'Hidden')
 	           	end
-	           	quest_board_update = true
 	            return sdk.PreHookResult.SKIP_ORIGINAL
 	        end
-	    end,
-	    function(retval)
-	    	quest_board_update = false
 	    end
 	)
 
