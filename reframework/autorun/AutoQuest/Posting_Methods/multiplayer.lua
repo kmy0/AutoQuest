@@ -12,6 +12,7 @@ local quest_counter_type_def = sdk.find_type_definition('snow.gui.fsm.questcount
 local loop_count = 0
 local loop_max = 100
 local target_name = nil
+local session_action_active = false
 
 local quest_counter_obj_ids = {
             [0]='nid002', --village
@@ -100,6 +101,7 @@ function multiplayer.switch()
                     end
                     local quest_data = dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)]
                     if quest_data and random_pool then
+                        session_action_active = false
                         vars.posting = true
                     elseif not quest_data then
                         functions.error_handler("Invalid Quest ID.")
@@ -115,6 +117,7 @@ end
 function multiplayer.hook()
     sdk.hook(methods.quest_session_action_update,
         function(args)
+            session_action_active = true
             if config.current.auto_quest.posting_method == 2 then
                 if vars.posting and config.current.auto_quest.send_join_request and not vars.selection_trigger and not vars.selected and methods.is_internet:call(nil) then
                     select_index_selection_window(1)
@@ -179,7 +182,7 @@ function multiplayer.hook()
                     vars.selected = false
                     return sdk.to_ptr(true)
 
-                elseif vars.decide_trigger and current_menu == 30 and not vars.selection_trigger then
+                elseif vars.decide_trigger and current_menu == 30 and not vars.selection_trigger and not session_action_active then
 
                     if not select_mystery_quest() then vars.selected = nil end
                     return retval
@@ -193,6 +196,10 @@ function multiplayer.hook()
                     return retval
 
                 elseif vars.decide_trigger and not vars.selected and vars.quest_type == 'Normal' then
+
+                    return sdk.to_ptr(true)
+
+                elseif vars.decide_trigger and session_action_active then
 
                     return sdk.to_ptr(true)
 
