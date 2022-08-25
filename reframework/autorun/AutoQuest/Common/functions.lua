@@ -62,6 +62,57 @@ function functions.toggle_options(state)
     end
 end
 
+function functions.deep_copy(original, copies)
+    copies = copies or {};
+    local original_type = type(original);
+    local copy;
+    if original_type == "table" then
+        if copies[original] then
+            copy = copies[original];
+        else
+            copy = {};
+            copies[original] = copy;
+            for original_key, original_value in next, original, nil do
+                copy[functions.deep_copy(original_key, copies)] = functions.deep_copy(original_value
+                    ,
+                    copies);
+            end
+            setmetatable(copy,
+                functions.deep_copy(getmetatable(original)
+                    , copies));
+        end
+    else -- number, string, boolean, etc
+        copy = original;
+    end
+    return copy;
+end
+
+function functions.merge(...)
+    local tables_to_merge = { ... };
+    assert(#tables_to_merge > 1, "There should be at least two tables to merge them");
+
+    for key, table in ipairs(tables_to_merge) do
+        assert(type(table) == "table", string.format("Expected a table as function parameter %d", key));
+    end
+
+    local result = functions.deep_copy(tables_to_merge[1]);
+
+    for i = 2, #tables_to_merge do
+        local from = tables_to_merge[i];
+        for key, value in pairs(from) do
+            if type(value) == "table" then
+                result[key] = result[key] or {};
+                assert(type(result[key]) == "table", string.format("Expected a table: '%s'", key));
+                result[key] = functions.merge(result[key], value);
+            else
+                result[key] = value;
+            end
+        end
+    end
+
+    return result;
+end
+
 function functions.init()
 	singletons = require("AutoQuest.singletons")
 	methods = require("AutoQuest.methods")
