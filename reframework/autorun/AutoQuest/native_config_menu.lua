@@ -267,6 +267,39 @@ function native_config_menu.draw()
 
 	end
 
+	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 2 then
+
+		_,config.current.auto_quest.anomaly_investigation_min_lv = mod_menu.Slider(
+																			"Anomaly Inv. Min Lv",
+																			config.current.auto_quest.anomaly_investigation_min_lv,
+																			1,
+																			100,
+																			"♥"
+																			)
+		_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
+																			"Anomaly Inv. Max Lv",
+																			config.current.auto_quest.anomaly_investigation_max_lv,
+																			1,
+																			100,
+																			"You can set this higher than game lets you normally. "
+																			)
+	else
+
+    	mod_menu.Label(
+				"<COL GRAY>Anomaly Inv. Min Lv</COL>",
+				config.current.auto_quest.anomaly_investigation_min_lv,
+				config.current.auto_quest.posting_method == 3 and "Random Anomaly Investigations only."
+				or config.current.auto_quest.posting_method ~= 3 and "Join Multiplayer Method only."
+				)
+    	mod_menu.Label(
+				"<COL GRAY>Anomaly Inv. Max Lv</COL>",
+				config.current.auto_quest.anomaly_investigation_max_lv,
+				config.current.auto_quest.posting_method == 3 and "Random Anomaly Investigations only."
+				or config.current.auto_quest.posting_method ~= 3 and "Join Multiplayer Method only."
+				)
+
+	end
+
 	_,config.current.auto_quest.auto_post = mod_menu.CheckBox(
 														'Auto ' ..config_menu.btn_text.. ' Quest',
 														config.current.auto_quest.auto_post,
@@ -680,7 +713,7 @@ function native_config_menu.draw()
 																			config.current.randomizer.exclude_anomaly_i_below,
 																			0,
 																			200,
-																			"" --
+																			"♥" --
 																			)
 			if changed then random_changed = true end
 			changed,config.current.randomizer.exclude_anomaly_i_above = mod_menu.Slider(
@@ -688,7 +721,7 @@ function native_config_menu.draw()
 																			config.current.randomizer.exclude_anomaly_i_above,
 																			0,
 																			200,
-																			"" --
+																			"♥" --
 																			)
 			if changed then random_changed = true end
 
