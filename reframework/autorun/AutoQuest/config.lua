@@ -1,9 +1,11 @@
 local config = {}
 
-config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.4'
+local functions
 
-config.current  = {
+config.config_file_name = 'AutoQuest/config.json'
+config.version = '1.4.1'
+
+config.default  = {
     auto_quest={
         posting_method=1,
         join_multi_type=1,
@@ -14,6 +16,8 @@ config.current  = {
         auto_depart=false,
         keep_rng=false,
         mystery_mode=false,
+        anomaly_investigation_min_lv=1,
+        anomaly_investigation_max_lv=100,
         quest_no=''
     },
     randomizer={
@@ -82,7 +86,9 @@ config.current  = {
 function config.load()
     local loaded_config = json.load_file(config.config_file_name)
     if loaded_config then
-        config.current = loaded_config
+        config.current = functions.merge(config.default, loaded_config)
+    else
+        config.current = functions.deep_copy(config.default)
     end
 end
 
@@ -91,6 +97,7 @@ function config.save()
 end
 
 function config.init()
+    functions = require("AutoQuest.Common.functions")
     config.load()
 end
 
