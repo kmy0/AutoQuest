@@ -8,6 +8,7 @@ local vars
 local dump
 local mystery_mode
 local randomizer
+local bind
 
 local quest_data = nil
 
@@ -88,6 +89,7 @@ function common_hooks.hook()
 
 			if vars.game_state == 4 and vars.prev_game_state ~= 4 and vars.prev_game_state ~= 3 and vars.prev_game_state ~= nil then
 				mystery_mode.stop = false
+				bind.block = false
 				if dump.ed then
 					dump.random_mystery()
 				end
@@ -141,6 +143,7 @@ function common_hooks.init()
     dump = require("AutoQuest.dump")
     mystery_mode = require("AutoQuest.mystery_mode")
     randomizer = require("AutoQuest.randomizer")
+    bind = require("AutoQuest.bind")
 	common_hooks.hook()
 end
 
