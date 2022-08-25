@@ -57,6 +57,21 @@ function config_menu.draw()
         _,config.current.auto_quest.join_multi_type = imgui.combo('Quest Type',config.current.auto_quest.join_multi_type,config_menu.join_multi_types)
     end
 
+    if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 2 then
+        _,config.current.auto_quest.anomaly_investigation_min_lv = imgui.slider_int(
+                                                                            "Anomaly Inv. Min Lv",
+                                                                            config.current.auto_quest.anomaly_investigation_min_lv,
+                                                                            1,
+                                                                            100
+                                                                            )
+        _,config.current.auto_quest.anomaly_investigation_max_lv = imgui.slider_int(
+                                                                            "Anomaly Inv. Max Lv",
+                                                                            config.current.auto_quest.anomaly_investigation_max_lv,
+                                                                            1,
+                                                                            100
+                                                                            )
+    end
+
     _,config.current.auto_quest.auto_post = imgui.checkbox('Auto ' ..config_menu.btn_text.. ' Quest', config.current.auto_quest.auto_post)
 
     if config.current.auto_quest.posting_method ~= 3 then
