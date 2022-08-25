@@ -14,6 +14,9 @@ local auto_join_timer = 0
 local auto_join_timer_max = 1500
 local order_index = 1
 local quest_board_quest_list_index = 0
+local quest_counter_menu_index = 1
+local set_ano_inv_fields = true
+local menu_type = nil
 local hall_status = nil
 
 local quest_board_menu_fields = {
@@ -36,14 +39,27 @@ local quest_board_menu_fields = {
                         list=nil,
                         cursor='<ParticipationTopCursor>k__BackingField',
                         type_def=quest_counter_menu_type_def
+                    },
+                    quest_counter_menu_clickthrough={
+                        list=nil,
+                        cursor='<ParticipationTopCursor>k__BackingField',
+                        type_def=quest_counter_menu_type_def
                     }
 }
 local quest_board_menu_id = {
                         [2]={ --investigations
                             top=13,
                             sub=5,
-                            quest_counter_menu=4,
-                            order={'top','sub','quest_counter_menu'}
+                            quest_counter_menu={0,1,4},
+                            order={
+                                'top',
+                                'sub',
+                                'quest_counter_menu',
+                                'quest_counter_menu_clickthrough',
+                                'quest_counter_menu',
+                                'quest_counter_menu_clickthrough',
+                                'quest_counter_menu'
+                            }
                         },
                         [3]={ --anomaly
                             top=13,
@@ -73,7 +89,16 @@ local function get_quest_board_menu_listless(target_id,target_type)
     local type_def = quest_board_menu_fields[target_type]['type_def']
     vars.cursor = type_def:get_field( quest_board_menu_fields[target_type]['cursor'] ):get_data()
     local cursor_index = methods.menu_list_cursor_get_index:call(vars.cursor)
-    if cursor_index == target_id then
+
+    if set_ano_inv_fields then
+        local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
+        local quest_counter_menu = quest_counter_singleton:get_field('<QuestCounterMenu>k__BackingField')
+        quest_counter_menu:set_field("_LevelMin",config.current.auto_quest.anomaly_investigation_min_lv)
+        quest_counter_menu:set_field("_LevelMax",config.current.auto_quest.anomaly_investigation_max_lv)
+        set_ano_inv_fields = false
+    end
+
+    if cursor_index == target_id or target_id == nil then
         vars.selected = true
         return true
     else
@@ -142,6 +167,8 @@ function join_multiplayer.switch()
                 functions.error_handler("No quests to join.")
             else
                 order_index = 1
+                quest_counter_menu_index = 1
+                set_ano_inv_fields = true
                 vars.posting = true
                 functions.open_quest_board()
             end
@@ -207,8 +234,15 @@ function join_multiplayer.hook()
             if config.current.auto_quest.posting_method == 3 then
                 if vars.posting and config.current.auto_quest.join_multi_type ~= 1 then
                     if vars.get_menu then
-                        local menu_type = quest_board_menu_id[config.current.auto_quest.join_multi_type]['order'][order_index]
+
+                        menu_type = quest_board_menu_id[config.current.auto_quest.join_multi_type]['order'][order_index]
+
                         local menu_id = quest_board_menu_id[config.current.auto_quest.join_multi_type][menu_type]
+
+                        if type(menu_id) == 'table' then
+                            menu_id = menu_id[quest_counter_menu_index]
+                        end
+
                         local bool = nil
 
                         if quest_board_menu_fields[menu_type]['list'] then
@@ -291,9 +325,14 @@ function join_multiplayer.hook()
                         end
                     end
                 end
+
                 if vars.posting and vars.selected and config.current.auto_quest.join_multi_type ~= 1 then
                     vars.selected = false
+
                     order_index = order_index + 1
+                    if menu_type == 'quest_counter_menu' then
+                        quest_counter_menu_index = quest_counter_menu_index + 1
+                    end
                     if order_index <= #quest_board_menu_id[config.current.auto_quest.join_multi_type]['order'] then
                         vars.get_menu = true
                     else
