@@ -22,8 +22,7 @@ function mystery_mode.hook()
 	sdk.hook(methods.get_quest_level,
 		function(args)
 			if config.current.auto_quest.mystery_mode
-			and not mystery_mode.stop
-			and not vars.quest_counter_open then
+			and not mystery_mode.stop then
 				return sdk.PreHookResult.SKIP_ORIGINAL
 			end
 		end
@@ -31,7 +30,7 @@ function mystery_mode.hook()
 
 	sdk.hook(methods.get_quest_icon,function(args)end,
 	    function(retval)
-	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            return sdk.to_ptr(0)
 	        else
 	            return retval
@@ -42,7 +41,9 @@ function mystery_mode.hook()
 
 	sdk.hook(methods.get_quest_text,function(args)end,
 	    function(retval)
-	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	    	if config.current.auto_quest.mystery_mode and (config.current.auto_quest.posting_method == 3 and vars.posting or vars.matching)
+	    	or config.current.auto_quest.mystery_mode and vars.posting and config.current.auto_quest.posting_method == 2 and vars.quest_type == 'Random Mystery'
+	    	or config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            local txt = sdk.create_managed_string('Hidden')
 	            return sdk.to_ptr(txt)
 	        else
@@ -53,7 +54,7 @@ function mystery_mode.hook()
 
 	sdk.hook(methods.quest_board_update_order,
 		function(args)
-	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            local quest_order_ctrl = methods.get_quest_board:call(singletons.guiman):get_field('_QuestOrderCtrl')
 	            for _,field in pairs(quest_board_order_fields) do
 	            	 methods.text_set_message:call(quest_order_ctrl:get_field(field),'Hidden')
@@ -63,9 +64,18 @@ function mystery_mode.hook()
 	    end
 	)
 
+	sdk.hook(methods.quest_counter_order_update,
+		function(args)
+	        if config.current.auto_quest.mystery_mode and (config.current.auto_quest.posting_method == 3 and vars.posting or vars.matching)
+	        or config.current.auto_quest.mystery_mode and vars.posting and config.current.auto_quest.posting_method == 2 and vars.quest_type == 'Random Mystery' then
+	            return sdk.PreHookResult.SKIP_ORIGINAL
+	        end
+	    end
+	)
+
 	sdk.hook(methods.quest_info_win_update,function(args)end,
 	    function(retval)
-	        if singletons.guiman and config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	        if singletons.guiman and config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            local quest_info_window = singletons.guiman:get_field('<refGuiLobbyQuestInfoWindow>k__BackingField')
 	            methods.text_set_message:call(quest_info_window:get_field('QuestSpotNameText'),'Hidden')
 	            methods.text_set_message:call(quest_info_window:get_field('StarText'),'Hidden')
@@ -76,7 +86,7 @@ function mystery_mode.hook()
 
 	sdk.hook(methods.is_random_mystery,function(args)end,
 	    function(retval)
-	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            return sdk.to_ptr(false)
 	        else
 	            return retval
@@ -86,7 +96,7 @@ function mystery_mode.hook()
 
 	sdk.hook(methods.is_mystery,function(args)end,
 	    function(retval)
-	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            return sdk.to_ptr(false)
 	        else
 	            return retval
@@ -97,7 +107,8 @@ function mystery_mode.hook()
 
 	sdk.hook(methods.get_quest_type,function(args)end,
 	    function(retval)
-	        if config.current.auto_quest.mystery_mode and not mystery_mode.stop and not vars.quest_counter_open then
+	    	if config.current.auto_quest.mystery_mode and (config.current.auto_quest.posting_method == 3 and vars.posting or vars.matching)
+	        or config.current.auto_quest.mystery_mode and not mystery_mode.stop then
 	            return sdk.to_ptr(sdk.create_int32(0))
 	        else
 	            return retval
