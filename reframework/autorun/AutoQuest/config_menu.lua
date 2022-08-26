@@ -22,7 +22,8 @@ config_menu.join_multi_types = {
                         'Random Anomaly',
                         'Random Master Rank',
                         'Random High Rank',
-                        'Random Low Rank'
+                        'Random Low Rank',
+                        'Specific Quest'
 }
 
 local function recover_gui()
@@ -54,7 +55,8 @@ function config_menu.draw()
     if changed then vars.posting_method_changed = true end
 
     if config.current.auto_quest.posting_method == 3 then
-        _,config.current.auto_quest.join_multi_type = imgui.combo('Quest Type',config.current.auto_quest.join_multi_type,config_menu.join_multi_types)
+        changed,config.current.auto_quest.join_multi_type = imgui.combo('Quest Type',config.current.auto_quest.join_multi_type,config_menu.join_multi_types)
+        if changed then random_changed = true end
     end
 
     if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 2 then
@@ -70,13 +72,18 @@ function config_menu.draw()
                                                                             1,
                                                                             100
                                                                             )
+        _,config.current.auto_quest.anomaly_investigation_monster = imgui.combo('Monster',config.current.auto_quest.anomaly_investigation_monster,dump.anomaly_investigations_main_monsters_array)
     end
 
     _,config.current.auto_quest.auto_post = imgui.checkbox('Auto ' ..config_menu.btn_text.. ' Quest', config.current.auto_quest.auto_post)
 
-    if config.current.auto_quest.posting_method ~= 3 then
+    if config.current.auto_quest.posting_method ~= 3
+    or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
         _,config.current.auto_quest.auto_randomize = imgui.checkbox('Auto Randomize Quest', config.current.auto_quest.auto_randomize)
-        _,config.current.auto_quest.keep_rng = imgui.checkbox('Keep RNG', config.current.auto_quest.keep_rng)
+    end
+
+    if config.current.auto_quest.posting_method ~= 3 then
+         _,config.current.auto_quest.keep_rng = imgui.checkbox('Keep RNG', config.current.auto_quest.keep_rng)
     end
 
     if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
@@ -94,20 +101,33 @@ function config_menu.draw()
 
     _,config.current.auto_quest.mystery_mode = imgui.checkbox('Mystery Mode', config.current.auto_quest.mystery_mode)
 
-    if config.current.auto_quest.posting_method ~= 3 then
+    if config.current.auto_quest.posting_method ~= 3
+    or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
         _,config.current.auto_quest.quest_no = imgui.input_text('Quest ID', config.current.auto_quest.quest_no)
     end
 
     if imgui.button(config_menu.btn_text.. ' Quest') then vars.post_quest_trigger = true end
 
-    if config.current.auto_quest.posting_method ~= 3 then
+    if config.current.auto_quest.posting_method
+    or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
 
         if imgui.button('Randomize') then randomizer.roll() end
         imgui.same_line()
         imgui.text(#randomizer.filtered_quest_list)
+
+    end
+
+    if config.current.auto_quest.posting_method ~= 3 then
+
         if imgui.button('Reload Quest Data') then dump.quest_data() end
         imgui.same_line()
         imgui.text(dump.no_of_quests)
+
+    end
+
+    if config.current.auto_quest.posting_method
+    or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
+
         if imgui.tree_node('Randomizer Settings') then
 
             if imgui.button('Select All') then
