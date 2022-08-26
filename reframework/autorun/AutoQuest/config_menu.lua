@@ -29,7 +29,6 @@ config_menu.join_multi_types = {
 local function recover_gui()
     vars.posting = false
     vars.close_trigger = false
-    vars.quest_counter_open = false
     functions.restore_state()
 end
 
