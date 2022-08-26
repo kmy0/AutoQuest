@@ -41,6 +41,7 @@ local function switch_posting_method()
     elseif config.current.auto_quest.posting_method == 3 then
         join_multiplayer.switch()
     end
+    randomizer.filter_quests()
 end
 
 
