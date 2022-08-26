@@ -21,5 +21,6 @@ vars.prev_game_state = nil
 vars.game_state = nil
 vars.error = false
 vars.quest_type = nil
+vars.matching = false
 
 return vars
