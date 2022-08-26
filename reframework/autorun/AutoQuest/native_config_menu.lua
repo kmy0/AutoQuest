@@ -25,6 +25,8 @@ native_config_menu.show_exclude_rampage_ranks = false
 native_config_menu.show_exclude_event_ranks = false
 native_config_menu.show_quest_types = false
 native_config_menu.show_other = false
+native_config_menu.show_anomaly_investigations_options = false
+native_config_menu.show_hub_quest_options = false
 native_config_menu.randomizer_options_toggle = false
 native_config_menu.timer = 0
 native_config_menu.prev_timer = 0
@@ -43,7 +45,8 @@ local join_multi_type_descs = {
 						'Queue for Random Anomaly Quest.',
 						'Queue for Random Master Rank Quest.',
 						'Queue for Random High Rank Quest.',
-						'Queue for Random Low Rank Quest.'
+						'Queue for Random Low Rank Quest.',
+						'Queue for Specific Quest.'
 }
 
 
@@ -94,7 +97,8 @@ function native_config_menu.draw()
 
 	mod_menu.Header("Buttons")
 
-	if config.current.auto_quest.posting_method ~= 3 then
+	if config.current.auto_quest.posting_method ~= 3
+	or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
 
 		button = mod_menu.Button(
 							not bind.listen_trigger and "<COL AUTOQUESTBR>Quest ID</COL>"
@@ -149,6 +153,29 @@ function native_config_menu.draw()
 			native_UI.regenOptions = true
 		end
 
+	else
+
+		mod_menu.Label(
+					"<COL GRAY>Quest ID</COL>",
+					config.current.auto_quest.quest_no,
+					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					)
+		mod_menu.Label(
+					"<COL GRAY>Randomize</COL>",
+					"",
+					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					)
+		mod_menu.Label(
+					not native_config_menu.randomizer_options_toggle and "<COL GRAY>Select Randomizer Chekboxes</COL>"
+					or native_config_menu.randomizer_options_toggle and "<COL GRAY>Unselect Randomizer Chekboxes</COL>",
+					"",
+					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					)
+
+	end
+
+	if config.current.auto_quest.posting_method ~= 3 then
+
 		button = mod_menu.Button(
 							"<COL AUTOQUESTBR>Reload Quest Data</COL>",
 							"<COL GRAY>"..dump.no_of_quests.."</COL>",
@@ -164,22 +191,6 @@ function native_config_menu.draw()
 
 	else
 
-		mod_menu.Label(
-					"<COL GRAY>Quest ID</COL>",
-					config.current.auto_quest.quest_no,
-					"Multiplayer, Singleplayer Methods only."
-					)
-		mod_menu.Label(
-					"<COL GRAY>Randomize</COL>",
-					"",
-					"Multiplayer, Singleplayer Methods only."
-					)
-		mod_menu.Label(
-					not native_config_menu.randomizer_options_toggle and "<COL GRAY>Select Randomizer Chekboxes</COL>"
-					or native_config_menu.randomizer_options_toggle and "<COL GRAY>Unselect Randomizer Chekboxes</COL>",
-					"",
-					"Multiplayer, Singleplayer Methods only."
-					)
 		mod_menu.Label(
 					"<COL GRAY>Reload Quest Data</COL>",
 					"",
@@ -257,48 +268,97 @@ function native_config_menu.draw()
 
 	else
 
-		_,config.current.auto_quest.join_multi_type = mod_menu.Options(
+		changed,config.current.auto_quest.join_multi_type = mod_menu.Options(
 																"Quest Type",
 																config.current.auto_quest.join_multi_type,
 																config_menu.join_multi_types,
 																join_multi_type_descs,
 																"Join Mulitplayer Quest Type."
 																)
+		if changed then random_changed = true end
 
 	end
 
 	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 2 then
 
-		_,config.current.auto_quest.anomaly_investigation_min_lv = mod_menu.Slider(
-																			"Anomaly Inv. Min Lv",
-																			config.current.auto_quest.anomaly_investigation_min_lv,
-																			1,
-																			100,
-																			"♥"
-																			)
-		_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
-																			"Anomaly Inv. Max Lv",
-																			config.current.auto_quest.anomaly_investigation_max_lv,
-																			1,
-																			100,
-																			"You can set this higher than game lets you normally. "
-																			)
-	else
+		button = mod_menu.Button(
+						"<COL YEL>Anomaly Investigations Options</COL>",
+						"",
+						false,
+						"Show/Hide Anomaly Investigations options."
+						)
+		if button then
 
-    	mod_menu.Label(
-				"<COL GRAY>Anomaly Inv. Min Lv</COL>",
-				config.current.auto_quest.anomaly_investigation_min_lv,
-				config.current.auto_quest.posting_method == 3 and "Random Anomaly Investigations only."
-				or config.current.auto_quest.posting_method ~= 3 and "Join Multiplayer Method only."
-				)
-    	mod_menu.Label(
-				"<COL GRAY>Anomaly Inv. Max Lv</COL>",
-				config.current.auto_quest.anomaly_investigation_max_lv,
-				config.current.auto_quest.posting_method == 3 and "Random Anomaly Investigations only."
-				or config.current.auto_quest.posting_method ~= 3 and "Join Multiplayer Method only."
-				)
+			native_config_menu.show_anomaly_investigations_options = not native_config_menu.show_anomaly_investigations_options
+			mod_menu.Repaint()
+
+		end
+
+		if native_config_menu.show_anomaly_investigations_options then
+
+			mod_menu.IncreaseIndent()
+
+			_,config.current.auto_quest.anomaly_investigation_min_lv = mod_menu.Slider(
+																				"Anomaly Inv. Min Lv",
+																				config.current.auto_quest.anomaly_investigation_min_lv,
+																				1,
+																				100,
+																				"♥"
+																				)
+			_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
+																				"Anomaly Inv. Max Lv",
+																				config.current.auto_quest.anomaly_investigation_max_lv,
+																				1,
+																				100,
+																				"You can set this higher than game lets you normally. "
+																				)
+
+			_,config.current.auto_quest.anomaly_investigation_monster = mod_menu.Options(
+																		"Monster",
+																		config.current.auto_quest.anomaly_investigation_monster,
+																		dump.anomaly_investigations_main_monsters_array,
+																		nil,
+																		"Random Anomaly Investigation Target"
+																		)
+		end
 
 	end
+
+	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
+
+		button = mod_menu.Button(
+						"<COL YEL>Hub Quest Options</COL>",
+						"",
+						false,
+						"Show/Hide Hub Quest options."
+						)
+		if button then
+
+			native_config_menu.show_hub_quest_options = not native_config_menu.show_hub_quest_options
+			mod_menu.Repaint()
+
+		end
+
+		if native_config_menu.show_hub_quest_options then
+
+			mod_menu.IncreaseIndent()
+
+			_,config.current.auto_quest.auto_join = mod_menu.CheckBox(
+															'Join New Hub Quests',
+															config.current.auto_quest.auto_join,
+															"Enable/Disable joining Hub Quests whenever new one is posted."
+															)
+			_,config.current.auto_quest.auto_ready = mod_menu.CheckBox(
+															'Auto Ready',
+															config.current.auto_quest.auto_ready,
+															"Enable/Disable readying up immediately after joining Hub Quest."
+															)
+
+		end
+
+	end
+
+	mod_menu.SetIndent(0)
 
 	_,config.current.auto_quest.auto_post = mod_menu.CheckBox(
 														'Auto ' ..config_menu.btn_text.. ' Quest',
@@ -306,13 +366,27 @@ function native_config_menu.draw()
 														"Enable/Disable Auto " .. config_menu.btn_text .. "ing quests upon returning to village."
 														)
 
-    if config.current.auto_quest.posting_method ~= 3 then
+	if config.current.auto_quest.posting_method ~= 3
+	or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
 
 		_,config.current.auto_quest.auto_randomize = mod_menu.CheckBox(
 															'Auto Randomize Quest',
 															config.current.auto_quest.auto_randomize,
 															"Enable/Disable Auto Randomizing Quests upon posting."
 															)
+
+	else
+
+    	mod_menu.Label(
+				"<COL GRAY>Auto Randomize Quest</COL>",
+				config.current.auto_quest.auto_randomize and '☒' or '☐',
+				"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+				)
+
+    end
+
+    if config.current.auto_quest.posting_method ~= 3 then
+
 		_,config.current.auto_quest.keep_rng = mod_menu.CheckBox(
 															'Keep RNG',
 															config.current.auto_quest.keep_rng,
@@ -321,46 +395,12 @@ function native_config_menu.draw()
 															)
     else
 
-    	mod_menu.Label(
-				"<COL GRAY>Auto Randomize Quest</COL>",
-				config.current.auto_quest.auto_randomize and '☒' or '☐',
-				"Multiplayer, Singleplayer Methods only."
-				)
+
     	mod_menu.Label(
 	    		"<COL GRAY>Keep RNG</COL>",
 	    		config.current.auto_quest.keep_rng and '☒' or '☐',
 	    		"Multiplayer, Singleplayer Methods only."
 	    		)
-
-    end
-
-    if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
-
-		_,config.current.auto_quest.auto_join = mod_menu.CheckBox(
-														'Join New Hub Quests',
-														config.current.auto_quest.auto_join,
-														"Enable/Disable joining Hub Quests whenever new one is posted."
-														)
-		_,config.current.auto_quest.auto_ready = mod_menu.CheckBox(
-														'Auto Ready',
-														config.current.auto_quest.auto_ready,
-														"Enable/Disable readying up immediately after joining Hub Quest."
-														)
-
-    else
-
-    	mod_menu.Label(
-					"<COL GRAY>Join New Hub Quests</COL>",
-					config.current.auto_quest.auto_join and '☒' or '☐',
-					config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type ~= 1 and "Hub Quest Type only."
-					or config.current.auto_quest.posting_method ~= 3 and "Join Multiplayer Method only."
-					)
-    	mod_menu.Label(
-					"<COL GRAY>Auto Ready</COL>",
-					config.current.auto_quest.auto_ready and '☒' or '☐',
-					config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type ~= 1 and "Hub Quest Type only."
-					or config.current.auto_quest.posting_method ~= 3 and "Join Multiplayer Method only."
-					)
 
     end
 
@@ -442,12 +482,12 @@ function native_config_menu.draw()
 
 	mod_menu.Header("Randomizer")
 
-	if config.current.auto_quest.posting_method == 3 then
+	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type ~= 7 then
 
 		mod_menu.Label(
 				"<COL GRAY>Quest Ranks</COL>",
 				'',
-				"Multiplayer, Singleplayer Methods only."
+				"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
 				)
 
 	else
@@ -570,12 +610,12 @@ function native_config_menu.draw()
 
 	mod_menu.SetIndent(0)
 
-	if config.current.auto_quest.posting_method == 3 then
+	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type ~= 7 then
 
 		mod_menu.Label(
 					"<COL GRAY>Quest Categories</COL>",
 					'',
-					"Multiplayer, Singleplayer Methods only."
+					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
 					)
 
 	else
@@ -934,12 +974,12 @@ function native_config_menu.draw()
 
 	mod_menu.SetIndent(0)
 
-	if config.current.auto_quest.posting_method == 3 then
+	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type ~= 7 then
 
 		mod_menu.Label(
 					"<COL GRAY>Quest Types</COL>",
 					'',
-					"Multiplayer, Singleplayer Methods only."
+					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
 					)
 
 	else
@@ -997,12 +1037,12 @@ function native_config_menu.draw()
 
 	mod_menu.SetIndent(0)
 
-	if config.current.auto_quest.posting_method == 3 then
+	if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type ~= 7 then
 
 		mod_menu.Label(
 					"<COL GRAY>Other</COL>",
 					'',
-					"Multiplayer, Singleplayer Methods only."
+					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
 					)
 
 	else
@@ -1112,6 +1152,8 @@ function native_config_menu.init()
 
 	mod_menu.AddTextColor("AUTOQUESTBR", "B3A46D")
 	mod_menu.AddTextColor("AUTOQUESTGREEN", "AFFF00")
+	-- mod_menu.AddTextColor("AUTOQUESTPICK", "FBD686")
+
 	native_config_menu.mod_menu = mod_menu
 
 	native_UI = mod_menu.OnMenu(
