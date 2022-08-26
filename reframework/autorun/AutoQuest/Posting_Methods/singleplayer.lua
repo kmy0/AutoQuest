@@ -7,6 +7,8 @@ local vars
 local randomizer
 local dump
 
+local quest_board_open = false
+local quest_posted = false
 
 function singleplayer.switch()
     function functions.post_quest()
@@ -31,10 +33,10 @@ function singleplayer.hook()
    	sdk.hook(methods.quest_board_top_start,function(args)end,
         function(retval)
             if config.current.auto_quest.posting_method == 1 then
-                if vars.posting and not vars.quest_board_open then
+                if vars.posting and not quest_board_open then
                 	local quest_board = methods.get_quest_board:call(singletons.guiman)
                 	methods.quest_board_decide_quick:call(quest_board,0,1)
-                	vars.quest_board_open = true
+                	quest_board_open = true
                 end
             else
                 return retval
@@ -61,10 +63,10 @@ function singleplayer.hook()
                 if vars.posting then
                     vars.posting = false
                     vars.close_trigger = false
-                    vars.quest_posted = true
+                    quest_posted = true
                     functions.restore_state()
                 end
-                vars.quest_board_open = false
+                quest_board_open = false
             else
                 return retval
             end
@@ -81,14 +83,14 @@ function singleplayer.hook()
 
     re.on_frame(function()
         if config.current.auto_quest.posting_method == 1 then
-            if vars.quest_posted and methods.is_online:call(singletons.lobbyman) and methods.can_open_quest_board:call(singletons.guiman) then
+            if quest_posted and methods.is_online:call(singletons.lobbyman) and methods.can_open_quest_board:call(singletons.guiman) then
                 local active_qi = methods.get_active_quest_id:call(singletons.questman)
                 local qi = sdk.create_instance('snow.LobbyManager.QuestIdentifier'):add_ref()
                 methods.quest_id_copy_from:call(qi,active_qi)
                 methods.create_room:call(singletons.lobbyman,qi)
-                vars.quest_posted = false
-            elseif vars.quest_posted and not methods.is_online(singletons.lobbyman) then
-                vars.quest_posted = false
+                quest_posted = false
+            elseif quest_posted and not methods.is_online(singletons.lobbyman) then
+                quest_posted = false
             end
         end
     end
