@@ -11,6 +11,7 @@ function randomizer.filter_quests()
     randomizer.filtered_quest_list = {}
     for no,data in pairs(dump.quest_data_list) do
         if not data then goto continue end
+        if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 and not data['online'] then goto continue end
         if data['type'] == dump.quest_types['INVALID'] then goto continue end
         if config.current.randomizer.exclude_posted_quests and config.current.randomizer.posted_quests[tostring(no)] then goto continue end
         if config.current.randomizer.exclude_custom and not dump.non_custom_quest_ids[tostring(no)] then goto continue end
@@ -24,7 +25,6 @@ function randomizer.filter_quests()
                 if data['level'] > config.current.randomizer.exclude_anomaly_i_above then goto continue end
             end
         end
-
         if data['category'] == 'Normal' then
             if config.current.randomizer.exclude_village and data['rank'] == dump.ranks_ids['Village'] then goto continue end
             if config.current.randomizer.exclude_low_rank and data['rank'] == dump.ranks_ids['Low'] then goto continue end
