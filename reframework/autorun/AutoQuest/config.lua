@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.4.1'
+config.version = '1.4.2'
 
 config.default  = {
     auto_quest={
