@@ -18,6 +18,7 @@ config.default  = {
         mystery_mode=false,
         anomaly_investigation_min_lv=1,
         anomaly_investigation_max_lv=100,
+        anomaly_investigation_monster=1,
         quest_no=''
     },
     randomizer={
