@@ -10,6 +10,8 @@ local quest_cat_list = {}
 dump.ed = false
 dump.no_of_quests = 0
 dump.non_custom_quest_ids_file_name = 'AutoQuest/noncustom_ids.json'
+dump.anomaly_investigations_main_monsters_file_name = 'AutoQuest/monsters.json'
+dump.anomaly_investigations_main_monsters_array = {}
 
 dump.quest_types = {
                 INVALID=0,
@@ -65,12 +67,15 @@ local function parse_quest_data(quest_data,event_ids,random_mystery)
     local unlocked = nil
     local type = nil
     local rank = nil
+    local online = false
 
     for no,quest in pairs(quest_data) do
 
         quest_cat,quest_level = get_quest_category(no)
 
+        online = false
         type = quest:get_field("_QuestType")
+
         if not quest_cat then
             if event_ids[no] then
                 quest_cat = 'Event'
@@ -84,6 +89,13 @@ local function parse_quest_data(quest_data,event_ids,random_mystery)
             else
                 quest_cat = 'Normal'
             end
+        end
+
+        if quest_cat ~= 'Random Mystery'
+        and quest_cat ~= 'Kingdom'
+        and quest_cat ~= 'ServantRequest'
+        and type ~= dump.quest_types['TRAINING'] then
+            online = true
         end
 
         if quest_cat ~= 'Mystery' then
@@ -138,7 +150,7 @@ local function parse_quest_data(quest_data,event_ids,random_mystery)
                         multi_monster=multi_monster,
                         unlocked=unlocked,
                         completed=completed,
-                        data=data
+                        online=online
                         }
 
         multi_monster = false
@@ -232,9 +244,20 @@ function dump.quest_data()
     dump.no_of_quests = functions.table_length(dump.quest_data_list)
 end
 
-function dump.non_custom_ids_load()
+function dump.load()
 	dump.non_custom_quest_ids = json.load_file(config.non_custom_quest_ids_file_name)
 	if not dump.non_custom_quest_ids then dump.non_custom_quest_ids = {} end
+    dump.anomaly_investigations_main_monsters = json.load_file(dump.anomaly_investigations_main_monsters_file_name)
+    if not dump.anomaly_investigations_main_monsters then
+        dump.anomaly_investigations_main_monsters = {}
+        dump.anomaly_investigations_main_monsters_array = {}
+    else
+        for k,_ in pairs(dump.anomaly_investigations_main_monsters) do
+            table.insert(dump.anomaly_investigations_main_monsters_array,k)
+        end
+        table.sort(dump.anomaly_investigations_main_monsters_array)
+        table.insert(dump.anomaly_investigations_main_monsters_array,1,'Any')
+    end
 end
 
 function dump.init()
@@ -243,7 +266,7 @@ function dump.init()
     methods = require("AutoQuest.methods")
     functions = require("AutoQuest.Common.functions")
     config = require("AutoQuest.config")
-    dump.non_custom_ids_load()
+    dump.load()
 end
 
 return dump
