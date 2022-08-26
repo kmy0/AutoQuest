@@ -13,6 +13,7 @@ local loop_count = 0
 local loop_max = 100
 local target_name = nil
 local session_action_active = false
+local req_select_attempt = false
 
 local quest_counter_obj_ids = {
             [0]='nid002', --village
@@ -119,11 +120,16 @@ function multiplayer.hook()
         function(args)
             session_action_active = true
             if config.current.auto_quest.posting_method == 2 then
-                if vars.posting and config.current.auto_quest.send_join_request and not vars.selection_trigger and not vars.selected and methods.is_internet:call(nil) then
+                if vars.posting and config.current.auto_quest.send_join_request and not req_select_attempt and not vars.selection_trigger and not vars.selected and methods.is_internet:call(nil) then
                     select_index_selection_window(1)
+                    req_select_attempt = true
                 elseif vars.posting and config.current.auto_quest.send_join_request and vars.selected then
                     vars.decide_trigger = true
                     vars.selected = false
+                elseif vars.selected == nil then
+                    vars.posting = false
+                    vars.cancel_trigger = true
+                    functions.error_handler("Menu selection timeout.")
                 end
             end
         end
@@ -139,10 +145,18 @@ function multiplayer.hook()
         end
     )
 
+    sdk.hook(methods.quest_session_action_end,
+        function(args)
+            if config.current.auto_quest.posting_method == 2 then
+                session_action_active = false
+                req_select_attempt = false
+            end
+        end
+    )
+
     sdk.hook(methods.set_quest_counter_state,function(args)end,
         function(args)
             if config.current.auto_quest.posting_method == 2 then
-                vars.quest_counter_open = true
                 if vars.posting then
                     vars.interact_trigger = false
 
@@ -221,7 +235,6 @@ function multiplayer.hook()
                     vars.decide_trigger = false
                 end
                 dump.random_mystery()
-                vars.quest_counter_open = false
             end
 
         end
@@ -244,7 +257,6 @@ function multiplayer.hook()
                         name = methods.get_gameobject_name:call(obj)
                         if loop_count == loop_max then
                             vars.posting = false
-                            vars.quest_counter_open = false
                             target_name = nil
                             loop_count = 0
                             functions.error_handler("Failed to find Quest Counter NPC\nMove closer and try again.")
