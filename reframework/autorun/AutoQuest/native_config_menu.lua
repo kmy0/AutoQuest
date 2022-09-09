@@ -186,6 +186,7 @@ function native_config_menu.draw()
 		if button then
 
 			dump.quest_data()
+			randomizer.filter_quests()
 
 		end
 
