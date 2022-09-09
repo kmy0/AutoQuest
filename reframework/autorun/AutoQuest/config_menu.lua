@@ -107,7 +107,7 @@ function config_menu.draw()
 
     if imgui.button(config_menu.btn_text.. ' Quest') then vars.post_quest_trigger = true end
 
-    if config.current.auto_quest.posting_method
+    if config.current.auto_quest.posting_method ~= 3
     or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
 
         if imgui.button('Randomize') then randomizer.roll() end
@@ -118,13 +118,16 @@ function config_menu.draw()
 
     if config.current.auto_quest.posting_method ~= 3 then
 
-        if imgui.button('Reload Quest Data') then dump.quest_data() end
+        if imgui.button('Reload Quest Data') then
+            dump.quest_data()
+            randomizer.filter_quests()
+        end
         imgui.same_line()
         imgui.text(dump.no_of_quests)
 
     end
 
-    if config.current.auto_quest.posting_method
+    if config.current.auto_quest.posting_method ~= 3
     or config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
 
         if imgui.tree_node('Randomizer Settings') then
