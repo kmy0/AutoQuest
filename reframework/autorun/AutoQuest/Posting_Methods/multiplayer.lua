@@ -118,8 +118,8 @@ end
 function multiplayer.hook()
     sdk.hook(methods.quest_session_action_update,
         function(args)
-            session_action_active = true
             if config.current.auto_quest.posting_method == 2 then
+                session_action_active = true
                 if vars.posting and config.current.auto_quest.send_join_request and not req_select_attempt and not vars.selection_trigger and not vars.selected and methods.is_internet:call(nil) then
                     select_index_selection_window(1)
                     req_select_attempt = true
