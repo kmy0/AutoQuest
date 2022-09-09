@@ -33,10 +33,7 @@ function common_hooks.hook()
 	sdk.hook(methods.quest_activate,function(args)end,
 	    function(retval)
 	        config.current.auto_quest.quest_no = singletons.questman:get_field('_QuestIdentifier'):get_field('_QuestNo')
-	        if config.current.auto_quest.posting_method == 1 and config.current.auto_quest.auto_depart then
-                local quest_handler = singletons.guiman:get_field('<refQuestStartFlowHandler>k__BackingField')
-                methods.go_quest:call(quest_handler,true)
-            elseif vars.posting then
+            if vars.posting then
 	            vars.close_trigger = true
 	        end
 	    end
@@ -92,6 +89,7 @@ function common_hooks.hook()
 				bind.block = false
 				if dump.ed then
 					dump.random_mystery()
+					randomizer.filter_quests()
 				end
 
 				local no = tonumber(config.current.auto_quest.quest_no)
