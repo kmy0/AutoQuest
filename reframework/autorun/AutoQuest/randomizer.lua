@@ -11,7 +11,9 @@ function randomizer.filter_quests()
     randomizer.filtered_quest_list = {}
     for no,data in pairs(dump.quest_data_list) do
         if not data then goto continue end
-        if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 and not data['online'] then goto continue end
+        if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
+            if not data['online'] or not dump.non_custom_quest_ids[tostring(no)] then goto continue end
+        end
         if data['type'] == dump.quest_types['INVALID'] then goto continue end
         if config.current.randomizer.exclude_posted_quests and config.current.randomizer.posted_quests[tostring(no)] then goto continue end
         if config.current.randomizer.exclude_custom and not dump.non_custom_quest_ids[tostring(no)] then goto continue end
@@ -88,9 +90,9 @@ function randomizer.filter_quests()
         if config.current.randomizer.exclude_hunt and data['type'] == dump.quest_types['HUNTING'] then goto continue end
         if config.current.randomizer.exclude_boss_rush and data['type'] == dump.quest_types['BOSSRUSH'] then goto continue end
         if config.current.randomizer.exclude_gathering and data['type'] == dump.quest_types['COLLECTS'] then goto continue end
-        if config.current.randomizer.exclude_small_monsters and (data['small_monster'] == true or data['small_monster'] == "Unknown") then goto continue end
-        if config.current.randomizer.exclude_single_monsters and (data['single_monster'] == true or data['single_monster'] == "Unknown") then goto continue end
-        if config.current.randomizer.exclude_multi_monster and (data['multi_monster'] == true or data['multi_monster'] == "Unknown") then goto continue end
+        if config.current.randomizer.exclude_small_monsters and data['monster_hunt_type'] == 'small' then goto continue end
+        if config.current.randomizer.exclude_single_monsters and data['monster_hunt_type'] == 'single' then goto continue end
+        if config.current.randomizer.exclude_multi_monster and data['monster_hunt_type'] == 'multi' then goto continue end
         if config.current.randomizer.exclude_not_unlocked and not data['unlocked'] then goto continue end
         if config.current.randomizer.exclude_completed and data['completed'] then goto continue end
 
