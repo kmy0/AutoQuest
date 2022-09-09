@@ -28,9 +28,9 @@ function functions.set_state()
 end
 
 function functions.table_length(table)
-      local count = 0
-      for _ in pairs(table) do count = count + 1 end
-      return count
+    local count = 0
+    for _ in pairs(table) do count = count + 1 end
+    return count
 end
 
 function functions.error_handler(error_message)
