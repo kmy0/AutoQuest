@@ -96,7 +96,6 @@ function singletons.get_startmenuman()
     return singletons.startmenuman
 end
 
-
 function singletons.init()
 	singletons.get_questman()
 	singletons.get_spacewatcher()
