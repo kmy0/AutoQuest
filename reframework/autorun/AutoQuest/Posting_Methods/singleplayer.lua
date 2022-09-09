@@ -47,7 +47,6 @@ function singleplayer.hook()
     sdk.hook(methods.quest_counter_awake,function(args)end,
         function(retval)
             if config.current.auto_quest.posting_method == 1 then
-                vars.quest_counter_open = true
                 if vars.posting then
                 	local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
                     if not config.current.auto_quest.keep_rng then methods.reset_quest_identifier:call(quest_counter_singleton) end
@@ -65,18 +64,14 @@ function singleplayer.hook()
                     vars.close_trigger = false
                     quest_posted = true
                     functions.restore_state()
+                    if config.current.auto_quest.auto_depart then
+                        local quest_handler = singletons.guiman:get_field('<refQuestStartFlowHandler>k__BackingField')
+                        methods.go_quest:call(quest_handler,true)
+                    end
                 end
                 quest_board_open = false
             else
                 return retval
-            end
-        end
-    )
-
-    sdk.hook(methods.quest_counter_on_destroy,
-        function(args)
-            if config.current.auto_quest.posting_method == 1 then
-                vars.quest_counter_open = false
             end
         end
     )
