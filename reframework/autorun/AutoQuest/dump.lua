@@ -189,6 +189,7 @@ function dump.quest_data()
         no = quest:get_field("_QuestNo")
         if no ~= 0 and no ~= -1 then
             quest_data[no]['category'] = 'Event'
+            dump.non_custom_quest_ids[tostring(no)] = 1
         end
     end
 
@@ -201,17 +202,6 @@ function dump.quest_data()
 
     parse_quest_data(quest_data)
 
-    if not next(dump.non_custom_quest_ids) then
-
-        for no,_ in pairs(quest_data) do
-            dump.non_custom_quest_ids[tostring(no)] = 1
-        end
-        for i=0,120 do
-            dump.non_custom_quest_ids[700000 + i] = 1
-        end
-        json.dump_file(dump.non_custom_quest_ids_file_name,dump.non_custom_quest_ids)
-
-    end
     dump.ed = true
     dump.no_of_quests = functions.table_length(dump.quest_data_list)
 end
