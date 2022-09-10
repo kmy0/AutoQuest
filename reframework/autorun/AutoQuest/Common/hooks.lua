@@ -59,7 +59,6 @@ function common_hooks.hook()
 
 	sdk.hook(methods.routine_quit,
 	    function(args)
-	        json.dump_file(dump.non_custom_quest_ids_file_name,{})
 	        config.save()
 	    end
 	)
