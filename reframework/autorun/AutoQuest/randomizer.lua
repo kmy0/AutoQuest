@@ -13,6 +13,8 @@ function randomizer.filter_quests()
         if not data then goto continue end
         if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
             if not data['online'] or not dump.non_custom_quest_ids[tostring(no)] then goto continue end
+        elseif config.current.auto_quest.posting_method == 2 and config.current.auto_quest.send_join_request then
+            if not data['online'] and data['category'] ~= 'Random Mystery' or not dump.non_custom_quest_ids[tostring(no)] then goto continue end
         end
         if data['type'] == dump.quest_types['INVALID'] then goto continue end
         if config.current.randomizer.exclude_posted_quests and config.current.randomizer.posted_quests[tostring(no)] then goto continue end
@@ -51,7 +53,7 @@ function randomizer.filter_quests()
                 if config.current.randomizer.exclude_anomaly_3 and data['level'] == 2 then goto continue end
                 if config.current.randomizer.exclude_anomaly_4 and data['level'] == 3 then goto continue end
                 if config.current.randomizer.exclude_anomaly_5 and data['level'] == 4 then goto continue end
-                -- if config.current.randomizer.exclude_anomaly_6 and data['level'] == 5 then goto continue end
+                if config.current.randomizer.exclude_anomaly_6 and data['level'] == 5 then goto continue end
             end
         end
         if data['category'] == 'Arena' then
