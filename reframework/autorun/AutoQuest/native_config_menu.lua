@@ -303,14 +303,14 @@ function native_config_menu.draw()
 																				"Anomaly Inv. Min Lv",
 																				config.current.auto_quest.anomaly_investigation_min_lv,
 																				1,
-																				100,
+																				120,
 																				"♥"
 																				)
 			_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
 																				"Anomaly Inv. Max Lv",
 																				config.current.auto_quest.anomaly_investigation_max_lv,
 																				1,
-																				100,
+																				120,
 																				"You can set this higher than game lets you normally. "
 																				)
 
@@ -407,11 +407,12 @@ function native_config_menu.draw()
 
     if config.current.auto_quest.posting_method == 2 then
 
-		_,config.current.auto_quest.send_join_request = mod_menu.CheckBox(
+		changed,config.current.auto_quest.send_join_request = mod_menu.CheckBox(
 																	'Send Join Request',
 																	config.current.auto_quest.send_join_request,
 																	"Enable/Disable sending Join Request immediately after quest start."
 																	)
+		if changed then random_changed = true end
 
     else
 
@@ -706,6 +707,12 @@ function native_config_menu.draw()
 																		'Exclude Anomaly Level 5',
 																		config.current.randomizer.exclude_anomaly_5,
 																		"Exclude/Include Anomaly Level 5 Quests."
+																		)
+            if changed then random_changed = true end
+            changed,config.current.randomizer.exclude_anomaly_6 = mod_menu.CheckBox(
+																		'Exclude Anomaly Level 6',
+																		config.current.randomizer.exclude_anomaly_6,
+																		"Exclude/Include Anomaly Level 6 Quests."
 																		)
             if changed then random_changed = true end
 
