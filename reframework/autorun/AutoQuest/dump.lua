@@ -76,7 +76,8 @@ local function parse_quest_data(quest_data)
         if quest_cat ~= 'Random Mystery'
         and quest_cat ~= 'Kingdom'
         and quest_cat ~= 'ServantRequest'
-        and type ~= dump.quest_types['TRAINING'] then
+        and type ~= dump.quest_types['TRAINING']
+        and type ~= dump.quest_types['ARENA'] then
             online = true
         end
 
@@ -220,6 +221,7 @@ function dump.load()
         table.sort(dump.anomaly_investigations_main_monsters_array)
         table.insert(dump.anomaly_investigations_main_monsters_array,1,'Any')
     end
+
 end
 
 function dump.init()
