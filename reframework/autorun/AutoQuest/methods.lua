@@ -9,6 +9,7 @@ methods.set_gui_invisible = guiman_type_def:get_method('setInvisibleAllGUI')
 methods.close_hud = guiman_type_def:get_method('closeStartMenuHudWithOpen()')
 methods.open_hud = guiman_type_def:get_method('openStartMenuHudWithClose')
 methods.get_options_window = guiman_type_def:get_method('get_refGuiOptionWindow')
+methods.open_all_quest_hud = guiman_type_def:get_method('openAllQuestHudUI')
 
 local gui_quest_board_type_def = sdk.find_type_definition('snow.gui.GuiQuestBoard')
 methods.quest_board_top_start = gui_quest_board_type_def:get_method('routineTopMenuStart')
@@ -44,6 +45,7 @@ methods.get_quest_level = quest_data_type_def:get_method('getQuestLvEx')
 methods.get_quest_text = quest_data_type_def:get_method('getQuestTextCore')
 methods.get_quest_type = quest_data_type_def:get_method('getQuestType')
 methods.is_random_mystery = quest_data_type_def:get_method('isRandomMysteryQuest')
+methods.check_quest_hr = quest_data_type_def:get_method('checkQuestOrderHunterRank')
 
 local gui_input_type_def = sdk.find_type_definition('snow.gui.StmGuiInput')
 methods.decide_button = gui_input_type_def:get_method('getDecideButtonTrg')
@@ -66,7 +68,7 @@ methods.focus_next_target = objaccman_type_def:get_method('focusNextTarget')
 local progquest_type_def = sdk.find_type_definition('snow.progress.quest.ProgressQuestManager')
 methods.is_hr_unlocked = progquest_type_def:get_method('get_IsUnlockHighRank')
 methods.is_quest_clear = progquest_type_def:get_method('isClear')
-methods.is_quest_unlocked = progquest_type_def:get_method('isUnlock')
+methods.is_quest_unlocked = progquest_type_def:get_method('isUnlock(snow.quest.QuestNo)')
 
 local quest_session_action_type_def = sdk.find_type_definition('snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction')
 methods.send_quest_to_questman = quest_session_action_type_def:get_method('setQuestInfoToQuestManager')
@@ -91,6 +93,10 @@ local vilman_type_def = sdk.find_type_definition('snow.VillageAreaManager')
 methods.get_location = vilman_type_def:get_method('get__CurrentAreaNo')
 methods.after_area_act = vilman_type_def:get_method('callAfterAreaActivation')
 
+local mysterylabo_type_def = sdk.find_type_definition('snow.data.MysteryLaboFacility')
+methods.get_research_target = mysterylabo_type_def:get_method('get_LaboTarget')
+methods.get_limit_lvl = mysterylabo_type_def:get_method('getLimitLv')
+
 methods.get_delta_time = sdk.find_type_definition('via.Application'):get_method('get_FrameTimeMillisecond')
 methods.get_hash_code = sdk.find_type_definition('System.Guid'):get_method('GetHashCode')
 methods.quest_counter_awake = sdk.find_type_definition('snow.SnowSingletonBehaviorRoot`1<snow.gui.fsm.questcounter.GuiQuestCounterFsmManager>'):get_method('awake')
@@ -108,6 +114,8 @@ methods.text_set_message = sdk.find_type_definition('via.gui.Text'):get_method('
 methods.routine_quit = sdk.find_type_definition('snow.gui.StmGuiGameQuitFlowCtrl'):get_method('routineQuit')
 methods.is_mystery = sdk.find_type_definition('snow.quest.QuestUtility'):get_method('isMysteryQuest')
 methods.go_quest = sdk.find_type_definition('snow.gui.QuestStartFlowHandler'):get_method('requestGoQuest')
+methods.get_mystery_labo = sdk.find_type_definition('snow.data.FacilityDataManager'):get_method('getMysteryLaboFacility')
+methods.get_randmystery_target = sdk.find_type_definition('snow.quest.RandomMysteryQuestData'):get_method('getMainTargetEmType')
 
 
 return methods
