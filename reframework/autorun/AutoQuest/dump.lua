@@ -53,13 +53,23 @@ local function parse_quest_data(quest_data)
     local rank = nil
     local online = false
     local target_num = 0
+    local is_research_request = false
+    local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
+    local research_request = methods.get_research_target:call(mysterylabo)
+    local research_monster = nil
+    local research_lvl = nil
+
+    if research_request then
+        research_monster = research_request:get_field('_MainTargetEnemyType')
+        research_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
+    end
 
     for no,quest in pairs(quest_data) do
 
         quest_cat = quest['category']
         quest_level = quest['level']
         quest = quest['data']
-
+        is_research_request = false
         online = false
         monster_hunt_type = 'none'
         target_num = 0
@@ -119,6 +129,13 @@ local function parse_quest_data(quest_data)
             rank = quest:get_field("_EnemyLv")
         end
 
+        if quest_cat == 'Random Mystery' and research_request then
+            local main_target = methods.get_randmystery_target:call(quest)
+            if main_target == research_monster and quest_level >= research_lvl then
+                is_research_request = true
+            end
+        end
+
         completed = methods.is_quest_clear:call(singletons.progquestman,no)
 
         if quest_cat == 'Event' and quest:get_field("_EnemyLv") == dump.ranks_ids['High'] and not highrank_unlock then
@@ -137,7 +154,8 @@ local function parse_quest_data(quest_data)
                         monster_hunt_type=monster_hunt_type,
                         unlocked=unlocked,
                         completed=completed,
-                        online=online
+                        online=online,
+                        research_request=is_research_request
                         }
 
     end
@@ -145,8 +163,10 @@ end
 
 function dump.random_mystery()
     local quest_data = {}
+
     for _,quest in pairs(singletons.questman:get_field('_RandomMysteryQuestData'):get_elements()) do
         no = quest:get_field("_QuestNo")
+
         if no ~= 0 and no ~= -1 then
             quest_data[no] = {data=quest,category='Random Mystery'}
         end
@@ -220,6 +240,7 @@ function dump.load()
         end
         table.sort(dump.anomaly_investigations_main_monsters_array)
         table.insert(dump.anomaly_investigations_main_monsters_array,1,'Any')
+        table.insert(dump.anomaly_investigations_main_monsters_array,2,'Research Target')
     end
 
 end
