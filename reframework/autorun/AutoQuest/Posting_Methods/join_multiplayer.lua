@@ -21,6 +21,7 @@ local menu_type = nil
 local hall_status = nil
 local quest_board_open = false
 local get_menu = false
+local set_research_target_lvl = false
 
 local quest_board_menu_fields = {
                     top={
@@ -100,6 +101,7 @@ local quest_board_menu_id = {
                             order={'top'}
                         }
 }
+
 local function get_quest_board_menu_listless(target_id,target_type)
     local type_def = quest_board_menu_fields[target_type]['type_def']
     vars.cursor = type_def:get_field( quest_board_menu_fields[target_type]['cursor'] ):get_data()
@@ -108,8 +110,15 @@ local function get_quest_board_menu_listless(target_id,target_type)
     if set_ano_inv_fields then
         local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
         local quest_counter_menu = quest_counter_singleton:get_field('<QuestCounterMenu>k__BackingField')
+        local max_lvl = config.current.auto_quest.anomaly_investigation_max_lv
+
         quest_counter_menu:set_field("_LevelMin",config.current.auto_quest.anomaly_investigation_min_lv)
-        quest_counter_menu:set_field("_LevelMax",config.current.auto_quest.anomaly_investigation_max_lv)
+
+        if set_research_target_lvl and config.current.auto_quest.anomaly_investigation_max_lv < set_research_target_lvl then
+            max_lvl = set_research_target_lvl
+        end
+
+        quest_counter_menu:set_field("_LevelMax",max_lvl)
         set_ano_inv_fields = false
     end
 
@@ -177,13 +186,31 @@ local function get_monster_list_index()
     local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
     local quest_counter_menu = quest_counter_singleton:get_field('<QuestCounterMenu>k__BackingField')
     local monster_list = quest_counter_menu:get_field('SubMenuItemsEmTypesList')
-    local monster_id = dump.anomaly_investigations_main_monsters[
+    local monster_id = 0
+    set_research_target_lvl = false
+
+    if config.current.auto_quest.anomaly_investigation_monster == 2 then
+        local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
+        local research_request = methods.get_research_target:call(mysterylabo)
+        if research_request then
+            monster_id = research_request:get_field('_MainTargetEnemyType')
+            set_research_target_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
+        else
+            index = 0
+        end
+    else
+        monster_id = dump.anomaly_investigations_main_monsters[
                                                     dump.anomaly_investigations_main_monsters_array[
                                                                             config.current.auto_quest.anomaly_investigation_monster
                                                                             ]
                                                     ]
+    end
+
     local index = monster_list:call('IndexOf',monster_id)
     if index == -1 then index = 0 end
+    if config.current.auto_quest.anomaly_investigation_monster == 'Research Target' and index == 0 then
+        set_research_target_lvl = false
+    end
     return index
 end
 
@@ -241,6 +268,16 @@ function join_multiplayer.hook()
                     get_menu = true
                     quest_board_open = true
                 end
+            else
+                return retval
+            end
+        end
+    )
+
+    sdk.hook(methods.check_quest_hr,function(args)end,
+        function(retval)
+            if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 and vars.posting then
+                return sdk.to_ptr(true)
             else
                 return retval
             end
