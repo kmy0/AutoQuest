@@ -153,6 +153,20 @@ function native_config_menu.draw()
 			native_UI.regenOptions = true
 		end
 
+		button = mod_menu.Button(
+							"<COL AUTOQUESTBR>Reload Quest Data</COL>",
+							"<COL GRAY>"..dump.no_of_quests.."</COL>",
+							false,
+							"Use this after loading custom quests if you want them to appear in the randomizer quest list - No. of quests"
+							)
+
+		if button then
+
+			dump.quest_data()
+			randomizer.filter_quests()
+
+		end
+
 	else
 
 		mod_menu.Label(
@@ -171,27 +185,6 @@ function native_config_menu.draw()
 					"",
 					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
 					)
-
-	end
-
-	if config.current.auto_quest.posting_method ~= 3 then
-
-		button = mod_menu.Button(
-							"<COL AUTOQUESTBR>Reload Quest Data</COL>",
-							"<COL GRAY>"..dump.no_of_quests.."</COL>",
-							false,
-							"Use this after loading custom quests if you want them to appear in the randomizer quest list - No. of quests"
-							)
-
-		if button then
-
-			dump.quest_data()
-			randomizer.filter_quests()
-
-		end
-
-	else
-
 		mod_menu.Label(
 					"<COL GRAY>Reload Quest Data</COL>",
 					"",
@@ -1121,6 +1114,11 @@ function native_config_menu.draw()
 																"Exclude/Include Already Posted Quests."
 																)
         if changed then random_changed = true end
+        _,config.current.randomizer.prefer_research_target = mod_menu.CheckBox(
+																'Prefer Anomaly Research Quests',
+																config.current.randomizer.prefer_research_target,
+																"Randomizer will pick Anomaly Research Quest over other quests if available."
+																)
 
         button = mod_menu.Button(
 							"<COL AUTOQUESTBR>Reset Posted Quests List<COL>",
