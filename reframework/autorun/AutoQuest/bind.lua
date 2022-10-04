@@ -412,6 +412,7 @@ end
 
 function bind.hook()
 	sdk.hook(methods.open_hud,function(args) bind.block = false end)
+	sdk.hook(methods.open_all_quest_hud,function(args) bind.block = false end)
 	sdk.hook(methods.close_hud,function(args) bind.block = true end)
 end
 
