@@ -145,6 +145,16 @@ function multiplayer.hook()
         end
     )
 
+    sdk.hook(methods.check_quest_hr,function(args)end,
+        function(retval)
+            if config.current.auto_quest.posting_method == 2 and vars.posting then
+                return sdk.to_ptr(true)
+            else
+                return retval
+            end
+        end
+    )
+
     sdk.hook(methods.quest_session_action_end,
         function(args)
             if config.current.auto_quest.posting_method == 2 then
