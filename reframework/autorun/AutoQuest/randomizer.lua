@@ -6,9 +6,11 @@ local functions
 local posted_quests = {}
 
 randomizer.filtered_quest_list = {}
+randomizer.research_request = {}
 
 function randomizer.filter_quests()
     randomizer.filtered_quest_list = {}
+    randomizer.research_request = {}
     for no,data in pairs(dump.quest_data_list) do
         if not data then goto continue end
         if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
@@ -97,6 +99,7 @@ function randomizer.filter_quests()
         if config.current.randomizer.exclude_multi_monster and data['monster_hunt_type'] == 'multi' then goto continue end
         if config.current.randomizer.exclude_not_unlocked and not data['unlocked'] then goto continue end
         if config.current.randomizer.exclude_completed and data['completed'] then goto continue end
+        if data['category'] == 'Random Mystery' and data['research_request'] then table.insert(randomizer.research_request,no) end
 
         table.insert(randomizer.filtered_quest_list,no)
         ::continue::
@@ -112,7 +115,11 @@ function randomizer.roll()
         functions.error_handler("There are no quests to randomize.\nTurn off some exclusions.")
         return false
     else
-        config.current.auto_quest.quest_no = randomizer.filtered_quest_list[ math.random(#randomizer.filtered_quest_list) ]
+        if config.current.randomizer.prefer_research_target and #randomizer.research_request ~= 0 then
+            config.current.auto_quest.quest_no = randomizer.research_request[ math.random(#randomizer.research_request) ]
+        else
+            config.current.auto_quest.quest_no = randomizer.filtered_quest_list[ math.random(#randomizer.filtered_quest_list) ]
+        end
         return true
     end
 
