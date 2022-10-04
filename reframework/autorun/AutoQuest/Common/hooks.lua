@@ -83,6 +83,10 @@ function common_hooks.hook()
 				randomizer.filter_quests()
 			end
 
+			if vars.game_state == 4 and vars.prev_game_state == 3 then
+				bind.block = false
+			end
+
 			if vars.game_state == 4 and vars.prev_game_state ~= 4 and vars.prev_game_state ~= 3 and vars.prev_game_state ~= nil then
 				mystery_mode.stop = false
 				bind.block = false
