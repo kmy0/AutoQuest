@@ -59,17 +59,17 @@ local quest_board_menu_id = {
                         [2]={ --investigations
                             top=13,
                             sub=5,
-                            quest_counter_menu={0,1,2,4},
+                            quest_counter_menu={2,1,0,4},
                             quest_counter_submenu='get',
                             order={
                                 'top',
                                 'sub',
                                 'quest_counter_menu',
-                                'quest_counter_menu_clickthrough',
-                                'quest_counter_menu',
-                                'quest_counter_menu_clickthrough',
-                                'quest_counter_menu',
                                 'quest_counter_submenu',
+                                'quest_counter_menu',
+                                'quest_counter_menu_clickthrough',
+                                'quest_counter_menu',
+                                'quest_counter_menu_clickthrough',
                                 'quest_counter_menu'
                             }
                         },
@@ -111,13 +111,17 @@ local function get_quest_board_menu_listless(target_id,target_type)
         local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
         local quest_counter_menu = quest_counter_singleton:get_field('<QuestCounterMenu>k__BackingField')
         local max_lvl = config.current.auto_quest.anomaly_investigation_max_lv
+        local min_lvl = config.current.auto_quest.anomaly_investigation_min_lv
 
-        quest_counter_menu:set_field("_LevelMin",config.current.auto_quest.anomaly_investigation_min_lv)
-
-        if set_research_target_lvl and config.current.auto_quest.anomaly_investigation_max_lv < set_research_target_lvl then
-            max_lvl = set_research_target_lvl
+        if set_research_target_lvl and min_lvl < set_research_target_lvl then
+            min_lvl = set_research_target_lvl
         end
 
+        if max_lvl < min_lvl then
+            max_lvl = min_lvl
+        end
+
+        quest_counter_menu:set_field("_LevelMin",min_lvl)
         quest_counter_menu:set_field("_LevelMax",max_lvl)
         set_ano_inv_fields = false
     end
@@ -188,10 +192,12 @@ local function get_monster_list_index()
     local monster_list = quest_counter_menu:get_field('SubMenuItemsEmTypesList')
     local monster_id = 0
     set_research_target_lvl = false
+    set_ano_inv_fields = true
 
     if config.current.auto_quest.anomaly_investigation_monster == 2 then
         local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
         local research_request = methods.get_research_target:call(mysterylabo)
+
         if research_request then
             monster_id = research_request:get_field('_MainTargetEnemyType')
             set_research_target_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
@@ -208,7 +214,7 @@ local function get_monster_list_index()
 
     local index = monster_list:call('IndexOf',monster_id)
     if index == -1 then index = 0 end
-    if config.current.auto_quest.anomaly_investigation_monster == 'Research Target' and index == 0 then
+    if config.current.auto_quest.anomaly_investigation_monster == 2 and index == 0 then
         set_research_target_lvl = false
     end
     return index
@@ -246,7 +252,6 @@ function join_multiplayer.switch()
             else
                 order_index = 1
                 quest_counter_menu_index = 1
-                set_ano_inv_fields = true
                 vars.posting = true
                 functions.open_quest_board()
             end
