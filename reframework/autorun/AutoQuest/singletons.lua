@@ -10,6 +10,7 @@ singletons.lobbyman = nil
 singletons.hwpad = nil
 singletons.hwkb = nil
 singletons.startmenuman = nil
+singletons.facilitydataman = nil
 
 
 function singletons.get_questman()
@@ -96,6 +97,13 @@ function singletons.get_startmenuman()
     return singletons.startmenuman
 end
 
+function singletons.get_facilitydataman()
+    if not singletons.facilitydataman then
+        singletons.facilitydataman = sdk.get_managed_singleton('snow.data.FacilityDataManager')
+    end
+    return singletons.facilitydataman
+end
+
 function singletons.init()
 	singletons.get_questman()
 	singletons.get_spacewatcher()
@@ -109,6 +117,7 @@ function singletons.init()
 	singletons.get_hwpad()
 	singletons.get_hwkb()
     singletons.get_startmenuman()
+    singletons.get_facilitydataman()
 end
 
 return singletons
