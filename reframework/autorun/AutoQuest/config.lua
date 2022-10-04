@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.4.4'
+config.version = '1.4.5'
 
 config.default  = {
     auto_quest={
@@ -71,6 +71,7 @@ config.default  = {
         exclude_custom=false,
         exclude_non_custom=false,
         exclude_posted_quests=false,
+        prefer_research_target=false,
         posted_quests={dummy=1},
     },
     button_bind={
