@@ -115,17 +115,12 @@ function config_menu.draw()
         imgui.same_line()
         imgui.text(#randomizer.filtered_quest_list)
 
-    end
-
-    if config.current.auto_quest.posting_method ~= 3 then
-
         if imgui.button('Reload Quest Data') then
             dump.quest_data()
             randomizer.filter_quests()
         end
         imgui.same_line()
         imgui.text(dump.no_of_quests)
-
     end
 
     if config.current.auto_quest.posting_method ~= 3
@@ -280,9 +275,10 @@ function config_menu.draw()
                 changed,config.current.randomizer.exclude_non_custom = imgui.checkbox('Exclude Non Custom', config.current.randomizer.exclude_non_custom)
                 if changed then random_changed = true end
                 changed,config.current.randomizer.exclude_posted_quests = imgui.checkbox('Exclude Posted', config.current.randomizer.exclude_posted_quests)
-                if changed then random_changed = true end
                 imgui.same_line()
                 if imgui.button('Reset Posted Quests List') then config.current.randomizer.posted_quests = {dummy=1} end
+                if changed then random_changed = true end
+                _,config.current.randomizer.prefer_research_target = imgui.checkbox('Prefer Anomaly Research Quests', config.current.randomizer.prefer_research_target)
                 imgui.tree_pop()
             end
             imgui.tree_pop()
