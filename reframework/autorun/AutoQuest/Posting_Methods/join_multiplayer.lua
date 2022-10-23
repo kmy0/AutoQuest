@@ -164,7 +164,7 @@ local function get_quest_board_menu(target_id,target_type)
 end
 
 local function check_posted_quests()
-    local hunter_info = singletons.lobbyman:get_field('_hunterInfo'):get_elements()
+    local hunter_info = functions.to_array(singletons.lobbyman:get_field('_hunterInfo'))
     for _,hunter in pairs(hunter_info) do
         if hunter then
             local status = hunter:get_field('_hallStatus')
