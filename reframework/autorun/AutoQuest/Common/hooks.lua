@@ -21,6 +21,10 @@ function common_hooks.hook()
     	function(args)
     		quest_data = nil
     		vars.quest_type = nil
+			if dump.ed and not vars.posting then
+				dump.random_mystery()
+				randomizer.filter_quests()
+			end
     	end
     )
 
