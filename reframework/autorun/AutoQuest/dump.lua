@@ -105,8 +105,8 @@ local function parse_quest_data(quest_data)
             end
         elseif type ~= dump.quest_types['TOUR'] and type ~= dump.quest_types['COLLECTS'] then
 
-            target_num = quest:get_field('_TgtNum'):get_elements()
-            target_num = target_num[1]:get_field('mValue') + target_num[2]:get_field('mValue')
+            target_num = functions.to_array(quest:get_field('_TgtNum'))
+            target_num = target_num[1] + target_num[2]
 
             if target_num == 1 then
                 monster_hunt_type = 'single'
@@ -164,7 +164,7 @@ end
 function dump.random_mystery()
     local quest_data = {}
 
-    for _,quest in pairs(singletons.questman:get_field('_RandomMysteryQuestData'):get_elements()) do
+    for _,quest in pairs(functions.to_array(singletons.questman:get_field('_RandomMysteryQuestData'))) do
         no = quest:get_field("_QuestNo")
 
         if no ~= 0 and no ~= -1 then
@@ -175,21 +175,21 @@ function dump.random_mystery()
         dump.quest_data_list[700000 + i] = nil
     end
     parse_quest_data(quest_data)
+    dump.no_of_quests = functions.table_length(dump.quest_data_list)
 end
 
 function dump.quest_data()
     local no = nil
     local quest_data = {}
-    local quest_dict = singletons.questman:get_field("_QuestDataDictionary"):get_field('_entries'):get_elements()
+    local quest_dict = functions.to_array(singletons.questman:get_field("_QuestDataDictionary"):get_field('_entries'))
     dump.quest_data_list = {}
 
     for k,v in pairs(quest_categories) do
         for i=0,7 do
             lst = methods.get_quest_no_array:call(singletons.questman,v,i)
             if lst then
-                lst = lst:get_elements()
-                for _,e in pairs(lst) do
-                    no = e:get_field("value__")
+                lst = functions.to_array(lst)
+                for _,no in pairs(lst) do
                     quest_data[no] = {category=k,level=i}
                 end
             end
@@ -206,7 +206,7 @@ function dump.quest_data()
         end
     end
 
-    for _,quest in pairs(singletons.questman:get_field('_DlQuestData'):get_field("_Param"):get_elements()) do
+    for _,quest in pairs(functions.to_array(singletons.questman:get_field('_DlQuestData'):get_field("_Param"))) do
         no = quest:get_field("_QuestNo")
         if no ~= 0 and no ~= -1 then
             quest_data[no]['category'] = 'Event'
@@ -214,7 +214,7 @@ function dump.quest_data()
         end
     end
 
-    for _,quest in pairs(singletons.questman:get_field('_RandomMysteryQuestData'):get_elements()) do
+    for _,quest in pairs(functions.to_array(singletons.questman:get_field('_RandomMysteryQuestData'))) do
         no = quest:get_field("_QuestNo")
         if no ~= 0 and no ~= -1 then
             quest_data[no] = {data=quest,category='Random Mystery'}
