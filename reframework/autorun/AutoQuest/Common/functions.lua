@@ -113,6 +113,15 @@ function functions.merge(...)
     return result;
 end
 
+function functions.to_array(obj)
+    array = {}
+    for i=0,obj:call('get_Count')-1 do
+        table.insert(array,obj:call('get_Item',i))
+    end
+    return array
+end
+
+
 function functions.init()
 	singletons = require("AutoQuest.singletons")
 	methods = require("AutoQuest.methods")
