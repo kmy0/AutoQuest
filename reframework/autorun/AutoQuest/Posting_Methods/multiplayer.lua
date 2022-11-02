@@ -57,8 +57,6 @@ local function get_quest_counter_menu()
     local menu_id = quest_counter_menu_list:call('get_Item',cursor_index)
     local bool = nil
 
-    -- if not dump.ed then dump.quest_data() end
-
     if dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)]['category'] == 'Random Mystery' then
         vars.quest_type = 'Random Mystery'
         bool = false
@@ -119,17 +117,19 @@ function multiplayer.hook()
     sdk.hook(methods.quest_session_action_update,
         function(args)
             if config.current.auto_quest.posting_method == 2 then
-                session_action_active = true
-                if vars.posting and config.current.auto_quest.send_join_request and not req_select_attempt and not vars.selection_trigger and not vars.selected and methods.is_internet:call(nil) then
-                    select_index_selection_window(1)
-                    req_select_attempt = true
-                elseif vars.posting and config.current.auto_quest.send_join_request and vars.selected then
-                    vars.decide_trigger = true
-                    vars.selected = false
-                elseif vars.selected == nil then
-                    vars.posting = false
-                    vars.cancel_trigger = true
-                    functions.error_handler("Menu selection timeout.")
+                if vars.posting then
+                    session_action_active = true
+                    if config.current.auto_quest.send_join_request and not req_select_attempt and not vars.selection_trigger and not vars.selected and methods.is_internet:call(nil) then
+                        select_index_selection_window(1)
+                        req_select_attempt = true
+                    elseif config.current.auto_quest.send_join_request and (vars.selected or not methods.is_internet:call(nil)) then
+                        vars.decide_trigger = true
+                        vars.selected = false
+                    elseif vars.selected == nil then
+                        vars.posting = false
+                        vars.cancel_trigger = true
+                        functions.error_handler("Menu selection timeout.")
+                    end
                 end
             end
         end
@@ -219,11 +219,7 @@ function multiplayer.hook()
                     functions.error_handler("Menu selection timeout.")
                     return retval
 
-                elseif vars.decide_trigger and not vars.selected and vars.quest_type == 'Normal' then
-
-                    return sdk.to_ptr(true)
-
-                elseif vars.decide_trigger and session_action_active then
+                elseif vars.decide_trigger and ( (not vars.selected and vars.quest_type == 'Normal') or session_action_active) then
 
                     return sdk.to_ptr(true)
 
@@ -244,7 +240,6 @@ function multiplayer.hook()
                     vars.close_trigger = false
                     vars.decide_trigger = false
                 end
-                dump.random_mystery()
             end
 
         end
