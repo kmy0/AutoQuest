@@ -4,14 +4,52 @@ local singletons
 local config
 local vars
 
-local quest_board_order_type_def = sdk.find_type_definition('snow.gui.QuestBoardOrder')
-local quest_board_order_fields = {}
-
-for _,field in pairs(quest_board_order_type_def:get_fields()) do
-	if field:get_type():get_name() == 'Text' then
-    	table.insert(quest_board_order_fields,field:get_name())
-    end
-end
+local quest_board_order_fields = {
+			'_txt_SpecialConditions_Top',
+			'_txt_SpecialConditions_Center',
+			'_txt_SpecialConditions_Bottom',
+			'_txt_EnemyTitle',
+			'_txt_Monster',
+			'_txt_Reward',
+			'_txt_EnviromentChangeInfo',
+			'_txt_EnviromentChangeInfo0',
+			'_txt_EnviromentChangeInfo1',
+			'_txt_RandomQuestRank',
+			'_txt_QuestCategory',
+			'_txt_QuestRank',
+			'_txt_QuestTitle',
+			'_txt_MainTarget',
+			'_txt_Place',
+			'_txt_Time',
+			'_txt_TimeUnit',
+			'_txt_TimeNone',
+			'_txt_MainMony',
+			'_txt_EnviromentInfo1',
+			'_txt_EnviromentInfo2',
+			'_txt_SubTarget1',
+			'_txt_SubTarget2',
+			'_txt_Enemy',
+			'_txt_Participation0',
+			'_txt_Participation1',
+			'_txt_Failure1',
+			'_txt_Client',
+			'_txt_ContentsOfRequest',
+			'_txt_H_QuestCategory',
+			'_txt_H_QuestDifficulty',
+			'_txt_H_QuestTitle',
+			'_txt_H_place',
+			'_txt_H_Area',
+			'_txt_H_RewardMoney',
+			'_txt_H_QuestScale1',
+			'_txt_H_QuestScale2',
+			'_txt_H_Reward',
+			'_txt_H_Condition1',
+			'_txt_H_Condition2',
+			'_pnl_H_Failure1',
+			'_pnl_H_Failure2',
+			'_pnl_H_Client',
+			'_pnl_H_Summary'
+}
 
 mystery_mode.stop = false
 
@@ -44,8 +82,7 @@ function mystery_mode.hook()
 	    	if config.current.auto_quest.mystery_mode and (config.current.auto_quest.posting_method == 3 and vars.posting or vars.matching)
 	    	or config.current.auto_quest.mystery_mode and vars.posting and config.current.auto_quest.posting_method == 2 and vars.quest_type == 'Random Mystery'
 	    	or config.current.auto_quest.mystery_mode and not mystery_mode.stop then
-	            local txt = sdk.create_managed_string('Hidden')
-	            return sdk.to_ptr(txt)
+	            return sdk.to_ptr(sdk.create_managed_string('Hidden'))
 	        else
 	            return retval
 	        end
