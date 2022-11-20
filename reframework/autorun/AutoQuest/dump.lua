@@ -34,7 +34,7 @@ dump.ranks_ids = {
                 Max=4
 }
 dump.quest_data_list = {}
-local quest_categories = {
+dump.quest_categories = {
                     Arena=6,
                     Kingdom=11,
                     Kyousei=10,
@@ -43,119 +43,111 @@ local quest_categories = {
 }
 
 local function parse_quest_data(quest_data)
-    local no = nil
-    local monster_hunt_type = ''
-    local quest_cat = nil
-    local quest_level = nil
     local highrank_unlock = methods.is_hr_unlocked:call(singletons.progquestman)
-    local unlocked = nil
-    local type = nil
-    local rank = nil
-    local online = false
-    local target_num = 0
-    local is_research_request = false
     local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
-    local research_request = methods.get_research_target:call(mysterylabo)
-    local research_monster = nil
-    local research_lvl = nil
+    local research = {}
+    research.request = methods.get_research_target:call(mysterylabo)
 
-    if research_request then
-        research_monster = research_request:get_field('_MainTargetEnemyType')
-        research_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
+    if research.request then
+        research.monster = research.request:get_field('_MainTargetEnemyType')
+        research.level = methods.get_limit_lvl:call(mysterylabo,research.request:get_field('_QuestCondition'))
     end
 
     for no,quest in pairs(quest_data) do
 
-        quest_cat = quest['category']
-        quest_level = quest['level']
-        quest = quest['data']
-        is_research_request = false
-        online = false
-        monster_hunt_type = 'none'
-        target_num = 0
-        type = quest:get_field("_QuestType")
+        local quest = {
+            category=quest.category,
+            level=quest.level,
+            data=quest.data,
+            is_research_request=false,
+            is_online=false,
+            monster_hunt_type='none',
+            target_num=0
+        }
 
-        if type == dump.quest_types['HYAKURYU'] then
-            quest_cat = 'Rampage'
+        quest.type = quest.data:get_field("_QuestType")
+
+        if quest.type == dump.quest_types['HYAKURYU'] then
+            quest.category = 'Rampage'
         end
 
-        if not quest_cat then
-            quest_cat = 'Normal'
+        if not quest.category then
+            quest.category = 'Normal'
         end
 
-        if quest_cat ~= 'Random Mystery'
-        and quest_cat ~= 'Kingdom'
-        and quest_cat ~= 'ServantRequest'
-        and type ~= dump.quest_types['TRAINING']
-        and type ~= dump.quest_types['ARENA'] then
-            online = true
+        if quest.category ~= 'Random Mystery'
+        and quest.category ~= 'Kingdom'
+        and quest.category ~= 'ServantRequest'
+        and quest.type ~= dump.quest_types['TRAINING']
+        and quest.type ~= dump.quest_types['ARENA'] then
+            quest.is_online = true
         end
 
-        if quest_cat ~= 'Mystery' then
-            quest_level = quest:get_field("_QuestLv")
+        if quest.category ~= 'Mystery' then
+            quest.level = quest.data:get_field("_QuestLv")
         end
 
-        if quest_cat == 'Rampage' then
-            monster_hunt_type = 'multi'
-        elseif quest_cat == 'Random Mystery' then
-            if quest:get_field('_HuntTargetNum') > 1 then
-                monster_hunt_type = 'multi'
+        if quest.category == 'Rampage' then
+            quest.monster_hunt_type = 'multi'
+        elseif quest.category == 'Random Mystery' then
+            if quest.data:get_field('_HuntTargetNum') > 1 then
+                quest.monster_hunt_type = 'multi'
             else
-                monster_hunt_type = 'single'
+                quest.monster_hunt_type = 'single'
             end
-        elseif type ~= dump.quest_types['TOUR'] and type ~= dump.quest_types['COLLECTS'] then
+        elseif quest.type ~= dump.quest_types['TOUR'] and quest.type ~= dump.quest_types['COLLECTS'] then
 
-            target_num = functions.to_array(quest:get_field('_TgtNum'))
-            target_num = target_num[1] + target_num[2]
+            quest.target_num = functions.to_array(quest.data:get_field('_TgtNum'))
+            quest.target_num = quest.target_num[1] + quest.target_num[2]
 
-            if target_num == 1 then
-                monster_hunt_type = 'single'
-            elseif target_num > 5 then
-                monster_hunt_type = 'small'
-            elseif target_num > 1 then
-                monster_hunt_type = 'multi'
+            if quest.target_num == 1 then
+                quest.monster_hunt_type = 'single'
+            elseif quest.target_num > 5 then
+                quest.monster_hunt_type = 'small'
+            elseif quest.target_num > 1 then
+                quest.monster_hunt_type = 'multi'
             end
         end
 
-        if quest_cat == 'Rampage' then
-            if quest:get_field("_isVIllage") then
-                rank = dump.ranks_ids['Village']
+        if quest.category == 'Rampage' then
+            if quest.data:get_field("_isVIllage") then
+                quest.rank = dump.ranks_ids['Village']
             else
-                rank = dump.ranks_ids['High']
+                quest.rank = dump.ranks_ids['High']
             end
-            quest_level = quest:get_field("_QuestLv")
-            type = dump.quest_types['HYAKURYU']
+            quest.level = quest.data:get_field("_QuestLv")
+            quest.type = dump.quest_types['HYAKURYU']
         else
-            rank = quest:get_field("_EnemyLv")
+            quest.rank = quest.data:get_field("_EnemyLv")
         end
 
-        if quest_cat == 'Random Mystery' and research_request then
-            local main_target = methods.get_randmystery_target:call(quest)
-            if main_target == research_monster and quest_level >= research_lvl then
-                is_research_request = true
+        if quest.category == 'Random Mystery' and research.request then
+            quest.main_target = methods.get_randmystery_target:call(quest.data)
+            if quest.main_target == research.monster and quest.level >= research.level then
+                quest.is_research_request = true
             end
         end
 
-        completed = methods.is_quest_clear:call(singletons.progquestman,no)
+        quest.is_completed = methods.is_quest_clear:call(singletons.progquestman,no)
 
-        if quest_cat == 'Event' and quest:get_field("_EnemyLv") == dump.ranks_ids['High'] and not highrank_unlock then
-            unlocked = false
-        elseif quest_cat == 'Event' then
-            unlocked = true
+        if quest.category == 'Event' and quest.data:get_field("_EnemyLv") == dump.ranks_ids['High'] and not highrank_unlock then
+            quest.is_unlocked = false
+        elseif quest.category == 'Event' then
+            quest.is_unlocked= true
         else
-            unlocked = methods.is_quest_unlocked:call(singletons.progquestman,no)
+            quest.is_unlocked = methods.is_quest_unlocked:call(singletons.progquestman,no)
         end
 
         dump.quest_data_list[no] = {
-                        type=type,
-                        rank=rank,
-                        level=quest_level,
-                        category=quest_cat,
-                        monster_hunt_type=monster_hunt_type,
-                        unlocked=unlocked,
-                        completed=completed,
-                        online=online,
-                        research_request=is_research_request
+                        type=quest.type,
+                        rank=quest.rank,
+                        level=quest.level,
+                        category=quest.category,
+                        monster_hunt_type=quest.monster_hunt_type,
+                        unlocked=quest.is_unlocked,
+                        completed=quest.is_completed,
+                        online=quest.is_online,
+                        research_request=quest.is_research_request
                         }
 
     end
@@ -184,7 +176,7 @@ function dump.quest_data()
     local quest_dict = functions.to_array(singletons.questman:get_field("_QuestDataDictionary"):get_field('_entries'))
     dump.quest_data_list = {}
 
-    for k,v in pairs(quest_categories) do
+    for k,v in pairs(dump.quest_categories) do
         for i=0,7 do
             lst = methods.get_quest_no_array:call(singletons.questman,v,i)
             if lst then
