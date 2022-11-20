@@ -3,8 +3,6 @@ local dump
 local config
 local functions
 
-local posted_quests = {}
-
 randomizer.filtered_quest_list = {}
 randomizer.research_request = {}
 
