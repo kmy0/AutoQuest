@@ -297,6 +297,17 @@ function multiplayer.hook()
         end
     )
 
+    sdk.hook(methods.is_servant_quest,function(args)end,
+        function(retval)
+            if config.current.auto_quest.posting_method == 2 and vars.posting then
+                return sdk.to_ptr(false)
+            else
+                return retval
+            end
+        end
+    )
+
+
 end
 
 function multiplayer.init()
