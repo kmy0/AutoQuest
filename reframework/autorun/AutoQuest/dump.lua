@@ -133,7 +133,7 @@ local function parse_quest_data(quest_data)
         if quest.category == 'Event' and quest.data:get_field("_EnemyLv") == dump.ranks_ids['High'] and not highrank_unlock then
             quest.is_unlocked = false
         elseif quest.category == 'Event' then
-            quest.is_unlocked= true
+            quest.is_unlocked = true
         else
             quest.is_unlocked = methods.is_quest_unlocked:call(singletons.progquestman,no)
         end
