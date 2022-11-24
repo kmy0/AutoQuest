@@ -63,13 +63,13 @@ function config_menu.draw()
                                                                             "Anomaly Inv. Min Lv",
                                                                             config.current.auto_quest.anomaly_investigation_min_lv,
                                                                             1,
-                                                                            120
+                                                                            200
                                                                             )
         _,config.current.auto_quest.anomaly_investigation_max_lv = imgui.slider_int(
                                                                             "Anomaly Inv. Max Lv",
                                                                             config.current.auto_quest.anomaly_investigation_max_lv,
                                                                             1,
-                                                                            120
+                                                                            200
                                                                             )
         _,config.current.auto_quest.anomaly_investigation_monster = imgui.combo('Monster',config.current.auto_quest.anomaly_investigation_monster,dump.anomaly_investigations_main_monsters_array)
     end
@@ -182,6 +182,8 @@ function config_menu.draw()
                         changed,config.current.randomizer.exclude_anomaly_5 = imgui.checkbox('A5', config.current.randomizer.exclude_anomaly_5)
                         if changed then random_changed = true end
                         changed,config.current.randomizer.exclude_anomaly_6 = imgui.checkbox('A6', config.current.randomizer.exclude_anomaly_6)
+                        if changed then random_changed = true end
+                        changed,config.current.randomizer.exclude_anomaly_7 = imgui.checkbox('A7', config.current.randomizer.exclude_anomaly_7)
                         if changed then random_changed = true end
                         imgui.tree_pop()
                     end
