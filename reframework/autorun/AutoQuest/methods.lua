@@ -56,6 +56,7 @@ methods.reset_quest_identifier = quest_counter_type_def:get_method('resetRequest
 methods.get_selected_quest = quest_counter_type_def:get_method('getQuestCounterSelectedQuest')
 methods.set_quest_counter_state = quest_counter_type_def:get_method('setOpenQuestCounterOnState')
 methods.get_active_menu_quest_list = quest_counter_type_def:get_method('getActiveQuestMenuList')
+methods.is_servant_quest = quest_counter_type_def:get_method('isCanJoinedServantQuest(System.Int32)')
 
 local quest_id_type_def = sdk.find_type_definition('snow.LobbyManager.QuestIdentifier')
 methods.quest_id_reset = quest_id_type_def:get_method('reset')
