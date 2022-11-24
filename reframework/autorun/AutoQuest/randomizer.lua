@@ -54,6 +54,7 @@ function randomizer.filter_quests()
                 if config.current.randomizer.exclude_anomaly_4 and data['level'] == 3 then goto continue end
                 if config.current.randomizer.exclude_anomaly_5 and data['level'] == 4 then goto continue end
                 if config.current.randomizer.exclude_anomaly_6 and data['level'] == 5 then goto continue end
+                if config.current.randomizer.exclude_anomaly_7 and data['level'] == 6 then goto continue end
             end
         end
         if data['category'] == 'Arena' then
