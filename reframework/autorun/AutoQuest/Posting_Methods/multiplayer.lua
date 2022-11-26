@@ -12,6 +12,7 @@ local quest_counter_type_def = sdk.find_type_definition('snow.gui.fsm.questcount
 local loop_count = 0
 local loop_max = 100
 local target_name = nil
+local get_menu = false
 local session_action_active = false
 local req_select_attempt = false
 
@@ -102,6 +103,7 @@ function multiplayer.switch()
                     if quest_data and random_pool then
                         session_action_active = false
                         vars.posting = true
+                        get_menu = true
                     elseif not quest_data then
                         functions.error_handler("Invalid Quest ID.")
                     end
@@ -167,7 +169,7 @@ function multiplayer.hook()
     sdk.hook(methods.set_quest_counter_state,function(args)end,
         function(args)
             if config.current.auto_quest.posting_method == 2 then
-                if vars.posting then
+                if vars.posting and get_menu then
                     vars.interact_trigger = false
 
                     if get_quest_counter_menu() then
@@ -176,6 +178,7 @@ function multiplayer.hook()
                         vars.close_trigger = true
                         functions.error_handler("Can't post chosen quest type.")
                     end
+                    get_menu = false
 
                 end
             end
@@ -201,18 +204,15 @@ function multiplayer.hook()
                     current_menu = quest_counter_type_def:get_field('<QuestCounterState>k__BackingField'):get_data()
 
                 end
-                if vars.decide_trigger and vars.selected or vars.decide_trigger and vars.quest_type == 'Normal' and current_menu ~= 0 then
-
+                if vars.decide_trigger and (vars.selected or vars.quest_type == 'Normal' and current_menu ~= 0 or vars.quest_type == 'Random Mystery' and current_menu == 32) then
                     vars.selected = false
                     return sdk.to_ptr(true)
 
                 elseif vars.decide_trigger and current_menu == 30 and not vars.selection_trigger and not session_action_active then
-
                     if not select_mystery_quest() then vars.selected = nil end
                     return retval
 
                 elseif vars.decide_trigger and vars.selected == nil then
-
                     vars.posting = false
                     vars.decide_trigger = false
                     vars.close_trigger = true
@@ -220,7 +220,6 @@ function multiplayer.hook()
                     return retval
 
                 elseif vars.decide_trigger and ( (not vars.selected and vars.quest_type == 'Normal') or session_action_active) then
-
                     return sdk.to_ptr(true)
 
                 else
