@@ -21,6 +21,7 @@ function randomizer.filter_quests()
         if config.current.randomizer.exclude_custom and not dump.non_custom_quest_ids[tostring(no)] then goto continue end
         if config.current.randomizer.exclude_non_custom and dump.non_custom_quest_ids[tostring(no)] then goto continue end
         if data['category'] == 'Random Mystery' then
+            if config.current.randomizer.exclude_invalid_anomaly_investigations and not data.valid then goto continue end
             if config.current.randomizer.exclude_anomaly_investigations then goto continue end
             if config.current.randomizer.exclude_anomaly_i_below > 0 then
                 if data['level'] < config.current.randomizer.exclude_anomaly_i_below then goto continue end
