@@ -272,6 +272,8 @@ function config_menu.draw()
                 if changed then random_changed = true end
                 changed,config.current.randomizer.exclude_completed = imgui.checkbox('Exclude Completed', config.current.randomizer.exclude_completed)
                 if changed then random_changed = true end
+                changed,config.current.randomizer.exclude_invalid_anomaly_investigations = imgui.checkbox('Exclude Invalid Anomaly Investigations', config.current.randomizer.exclude_invalid_anomaly_investigations)
+                if changed then random_changed = true end
                 changed,config.current.randomizer.exclude_custom = imgui.checkbox('Exclude Custom', config.current.randomizer.exclude_custom)
                 if changed then random_changed = true end
                 changed,config.current.randomizer.exclude_non_custom = imgui.checkbox('Exclude Non Custom', config.current.randomizer.exclude_non_custom)
