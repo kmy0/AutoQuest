@@ -1102,6 +1102,12 @@ function native_config_menu.draw()
 																"Exclude/Include Completed Quests."
 																)
         if changed then random_changed = true end
+        changed,config.current.randomizer.exclude_invalid_anomaly_investigations = mod_menu.CheckBox(
+																'Exclude Invalid Anomaly Investigations',
+																config.current.randomizer.exclude_invalid_anomaly_investigations,
+																"Exclude/Include Invalid Anomaly Investigations."
+																)
+        if changed then random_changed = true end
         changed,config.current.randomizer.exclude_custom = mod_menu.CheckBox(
 																'Exclude Custom',
 																config.current.randomizer.exclude_custom,
