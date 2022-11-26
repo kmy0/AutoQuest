@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.4.7'
+config.version = '1.4.8'
 
 config.default  = {
     auto_quest={
@@ -68,6 +68,7 @@ config.default  = {
         exclude_single_monsters=false,
         exclude_multi_monster=false,
         exclude_not_unlocked=false,
+        exclude_invalid_anomaly_investigations=true,
         exclude_completed=false,
         exclude_custom=false,
         exclude_non_custom=false,
