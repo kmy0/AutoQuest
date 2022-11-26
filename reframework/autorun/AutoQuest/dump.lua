@@ -62,7 +62,8 @@ local function parse_quest_data(quest_data)
             is_research_request=false,
             is_online=false,
             monster_hunt_type='none',
-            target_num=0
+            target_num=0,
+            is_valid=true
         }
 
         quest.type = quest.data:get_field("_QuestType")
@@ -128,6 +129,12 @@ local function parse_quest_data(quest_data)
             end
         end
 
+        if quest.category == 'Random Mystery' then
+            if methods.random_mystery_quest_auth:call(singletons.questman,quest.data,false) ~= 0 then
+                quest.is_valid = false
+            end
+        end
+
         quest.is_completed = methods.is_quest_clear:call(singletons.progquestman,no)
 
         if quest.category == 'Event' and quest.data:get_field("_EnemyLv") == dump.ranks_ids['High'] and not highrank_unlock then
@@ -147,7 +154,8 @@ local function parse_quest_data(quest_data)
                         unlocked=quest.is_unlocked,
                         completed=quest.is_completed,
                         online=quest.is_online,
-                        research_request=quest.is_research_request
+                        research_request=quest.is_research_request,
+                        valid=quest.is_valid
                         }
 
     end
@@ -158,7 +166,6 @@ function dump.random_mystery()
 
     for _,quest in pairs(functions.to_array(singletons.questman:get_field('_RandomMysteryQuestData'))) do
         no = quest:get_field("_QuestNo")
-
         if no ~= 0 and no ~= -1 then
             quest_data[no] = {data=quest,category='Random Mystery'}
         end
