@@ -12,7 +12,8 @@ local menu_list_type_def = sdk.find_type_definition('snow.gui.SnowGuiCommonBehav
 
 local auto_join_trigger = false
 local auto_join_timer = 0
-local auto_join_timer_max = 1500
+local auto_join_timer_min = 500
+local auto_join_timer_max = 2000
 local order_index = 1
 local quest_board_quest_list_index = 0
 local quest_counter_menu_index = 1
@@ -525,15 +526,17 @@ function join_multiplayer.hook()
     re.on_frame(function()
         if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
             if auto_join_trigger then
-                if check_posted_quests() then
-                    auto_join_timer = 0
-                    auto_join_trigger = false
-                    vars.post_quest_trigger = true
-                else
-                    auto_join_timer = auto_join_timer + methods.get_delta_time:call(nil)
-                    if auto_join_timer >= auto_join_timer_max then
+                auto_join_timer = auto_join_timer + methods.get_delta_time:call(nil)
+                if auto_join_timer >= auto_join_timer_min then
+                    if check_posted_quests() then
                         auto_join_timer = 0
                         auto_join_trigger = false
+                        vars.post_quest_trigger = true
+                    else
+                        if auto_join_timer >= auto_join_timer_max then
+                            auto_join_timer = 0
+                            auto_join_trigger = false
+                        end
                     end
                 end
             end
