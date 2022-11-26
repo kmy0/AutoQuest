@@ -117,6 +117,7 @@ methods.is_mystery = sdk.find_type_definition('snow.quest.QuestUtility'):get_met
 methods.go_quest = sdk.find_type_definition('snow.gui.QuestStartFlowHandler'):get_method('requestGoQuest')
 methods.get_mystery_labo = sdk.find_type_definition('snow.data.FacilityDataManager'):get_method('getMysteryLaboFacility')
 methods.get_randmystery_target = sdk.find_type_definition('snow.quest.RandomMysteryQuestData'):get_method('getMainTargetEmType')
+methods.random_mystery_quest_auth = sdk.find_type_definition('snow.quest.nRandomMysteryQuest'):get_method('checkRandomMysteryQuestOrderBan')
 
 
 return methods
