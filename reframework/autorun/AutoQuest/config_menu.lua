@@ -5,8 +5,10 @@ local functions
 local randomizer
 local bind
 local dump
+local vars
 
 local random_changed = false
+local changed = false
 
 config_menu.window_flags = 0x10120
 config_menu.window_pos = Vector2f.new(400, 200)
@@ -26,17 +28,12 @@ config_menu.join_multi_types = {
                         'Specific Quest'
 }
 
-local function recover_gui()
-    vars.posting = false
-    vars.close_trigger = false
-    functions.restore_state()
-end
 
 function config_menu.draw()
     imgui.set_next_window_pos(config_menu.window_pos, 1 << 3, config_menu.window_pivot)
     imgui.set_next_window_size(config_menu.window_size, 1 << 3)
 
-   	config_menu.is_opened = imgui.begin_window("AutoQuest",config_menu.is_opened, config_menu.window_flags)
+   	config_menu.is_opened = imgui.begin_window("AutoQuest "..config.version,config_menu.is_opened, config_menu.window_flags)
 
 	if not config_menu.is_opened then
 		imgui.end_window()
@@ -72,6 +69,9 @@ function config_menu.draw()
                                                                             200
                                                                             )
         _,config.current.auto_quest.anomaly_investigation_monster = imgui.combo('Monster',config.current.auto_quest.anomaly_investigation_monster,dump.anomaly_investigations_main_monsters_array)
+        _,config.current.auto_quest.anomaly_investigation_hunter_num = imgui.combo('Party Size',config.current.auto_quest.anomaly_investigation_hunter_num,dump.hunter_num_array)
+        changed,config.current.auto_quest.anomaly_investigation_cap_max_lvl = imgui.checkbox('Set Max Lv At Current Research Lv', config.current.auto_quest.anomaly_investigation_cap_max_lvl)
+        if changed and config.current.auto_quest.anomaly_investigation_cap_max_lvl then functions.set_random_myst_lvl_to_max() end
     end
 
     _,config.current.auto_quest.auto_post = imgui.checkbox('Auto ' ..config_menu.btn_text.. ' Quest', config.current.auto_quest.auto_post)
@@ -90,7 +90,7 @@ function config_menu.draw()
         _,config.current.auto_quest.auto_ready = imgui.checkbox('Auto Ready', config.current.auto_quest.auto_ready)
     end
 
-    if config.current.auto_quest.posting_method == 1 then
+    if config.current.auto_quest.posting_method ~= 3 then
         _,config.current.auto_quest.auto_depart = imgui.checkbox('Auto Depart', config.current.auto_quest.auto_depart)
     end
 
@@ -292,14 +292,7 @@ function config_menu.draw()
         randomizer.filter_quests()
         random_changed = false
     end
-    if config.current.auto_quest.posting_method == 1 then
-        if imgui.tree_node('GUI Settings') then
-            _,config.current.gui.hide_gui = imgui.checkbox('Hide GUI while posting', config.current.gui.hide_gui)
-            _,config.current.gui.mute_ui_sounds = imgui.checkbox('Mute UI sounds while posting', config.current.gui.mute_ui_sounds)
-            if imgui.button('Restore GUI') then functions.restore_state() end
-            imgui.tree_pop()
-        end
-    end
+
     if imgui.tree_node(config_menu.btn_text.. ' Quest Bind') then
 
         if not bind.new_bind_trigger and imgui.button('         '.. config.current.button_bind.button_name..'           ') then
@@ -390,6 +383,7 @@ function config_menu.init()
     dump = require("AutoQuest.dump")
     randomizer = require("AutoQuest.randomizer")
     functions = require("AutoQuest.Common.functions")
+    vars = require("AutoQuest.Common.vars")
 end
 
 return config_menu
