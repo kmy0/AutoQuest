@@ -207,15 +207,14 @@ function quest_counter.hook()
 
     sdk.hook(methods.open_all_quest_hud,function(args)end,
         function(retval)
-            if config.current.auto_quest.posting_method == 2
-            and vars.posting then
-                vars.posting = false
+            if config.current.auto_quest.posting_method == 2 then
                 vars.decide_trigger = false
                 vars.close_trigger = false
                 singletons.quest_counter = nil
-                if config.current.auto_quest.auto_depart and methods.is_quest_posted:call(singletons.questman) then
+                if vars.posting and config.current.auto_quest.auto_depart and methods.is_quest_posted:call(singletons.questman) then
                     methods.go_quest:call(singletons.guiman:get_field('<refQuestStartFlowHandler>k__BackingField'),true)
                 end
+                vars.posting = false
             end
         end
     )
