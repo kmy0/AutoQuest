@@ -11,6 +11,7 @@ dump.no_of_quests = 0
 dump.non_custom_quest_ids_file_name = 'AutoQuest/noncustom_ids.json'
 dump.anomaly_investigations_main_monsters_file_name = 'AutoQuest/monsters.json'
 dump.anomaly_investigations_main_monsters_array = {}
+dump.hunter_num_array = {'2','4'}
 
 dump.quest_types = {
                 INVALID=0,
@@ -165,7 +166,7 @@ function dump.random_mystery()
     local quest_data = {}
 
     for _,quest in pairs(functions.to_array(singletons.questman:get_field('_RandomMysteryQuestData'))) do
-        no = quest:get_field("_QuestNo")
+        local no = quest:get_field("_QuestNo")
         if no ~= 0 and no ~= -1 then
             quest_data[no] = {data=quest,category='Random Mystery'}
         end
@@ -185,7 +186,7 @@ function dump.quest_data()
 
     for k,v in pairs(dump.quest_categories) do
         for i=0,7 do
-            lst = methods.get_quest_no_array:call(singletons.questman,v,i)
+            local lst = methods.get_quest_no_array:call(singletons.questman,v,i)
             if lst then
                 lst = functions.to_array(lst)
                 for _,no in pairs(lst) do
