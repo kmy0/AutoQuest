@@ -3,6 +3,7 @@ local methods
 local config
 local vars
 local native_config_menu
+local singletons
 
 local quest_board_cmd_id = sdk.find_type_definition('snow.gui.GuiManager.OtherCmdId'):get_field('QuestBoard'):get_data(nil)
 
@@ -14,17 +15,8 @@ function functions.open_quest_board()
     methods.invoke_action_bar_id:call(singletons.guiman,quest_board_cmd_id)
 end
 
-function functions.restore_state()
-    if config.current.gui.hide_gui then methods.set_gui_invisible:call(singletons.guiman,false) end
-    if config.current.gui.mute_ui_sounds and vars.ui_vol then singletons.wwiseman:set_field('_CurrentVolumeUI',vars.ui_vol) end
-end
-
-function functions.set_state()
-    if config.current.gui.hide_gui then methods.set_gui_invisible:call(singletons.guiman,true) end
-    if config.current.gui.mute_ui_sounds then
-        vars.ui_vol = singletons.wwiseman:get_field('_CurrentVolumeUI')
-        singletons.wwiseman:set_field('_CurrentVolumeUI',0)
-    end
+function functions.set_random_myst_lvl_to_max()
+    config.current.auto_quest.anomaly_investigation_max_lv = methods.get_mystery_research_level:call(singletons.progman)
 end
 
 function functions.table_length(table)
@@ -114,7 +106,7 @@ function functions.merge(...)
 end
 
 function functions.to_array(obj)
-    array = {}
+    local array = {}
     for i=0,obj:call('get_Count')-1 do
         table.insert(array,obj:call('get_Item',i))
     end
