@@ -17,7 +17,7 @@ config_menu.window_size = Vector2f.new(560, 600)
 
 config_menu.is_opened = false
 config_menu.btn_text = 'Post'
-config_menu.post_methods = {'Singleplayer','Multiplayer','Join Multiplayer'}
+config_menu.post_methods = {'Speedrun','Quest Counter','Quest Board'}
 config_menu.join_multi_types = {
                         'Hub Quest',
                         'Random Anomaly Investigations',
@@ -46,7 +46,7 @@ function config_menu.draw()
         config_menu.btn_text = 'Post'
     end
 
-    changed,config.current.auto_quest.posting_method = imgui.combo('Posting Method',config.current.auto_quest.posting_method,config_menu.post_methods)
+    changed,config.current.auto_quest.posting_method = imgui.combo('Mode',config.current.auto_quest.posting_method,config_menu.post_methods)
 
     if changed then vars.posting_method_changed = true end
 
@@ -305,25 +305,23 @@ function config_menu.draw()
         imgui.tree_pop()
     end
     if imgui.tree_node('Explanations') then
-        if imgui.tree_node('Posting Method') then
-            if imgui.tree_node('Multiplayer') then
+        if imgui.tree_node('Mode') then
+            if imgui.tree_node('Quest Counter') then
                 imgui.text(
-                    'Required method if you want to post quest for people in your lobby\n' ..
-                    'or activate Join Request later. Also can be used if you play singleplayer.\n' ..
                     'Quests can be posted only in 3 areas, Elgado, Kamura Village and Kamura Hub\n'..
-                    'while somewhat close to Quest Counter. GUI cant be disabled while posting.'
+                    'while somewhat close to Quest Counter.'
                     )
                 imgui.tree_pop()
             end
-            if imgui.tree_node('Singleplayer') then
+            if imgui.tree_node('Speedrun') then
                 imgui.text(
-                    'Other people cant join quests posted with this method.\n'..
+                    'Other people cant join quests posted with this mode.\n'..
                     'Quests can be posted from each area that lets you open Quest Board.\n'..
-                    'Is faster than Multiplayer method and GUI can be disabled while posting.'
+                    'Faster than Quest Counter Mode.'
                     )
                 imgui.tree_pop()
             end
-            if imgui.tree_node('Join Multiplayer') then
+            if imgui.tree_node('Quest Board') then
                 imgui.text(
                     'Queues for random multiplayer quests of your choosing or joins hub quests.'
                     )
@@ -341,9 +339,13 @@ function config_menu.draw()
         end
         if imgui.tree_node('Join New Hub Quests') then
             imgui.text(
-                'When enabled mod will attempt to join new hub quests whenever one is posted.\n'..
-                'Tbh I dislike this option as its essentially giving a bit of control to other players,\n'..
-                'but its there if you want it.'
+                'When enabled mod will attempt to join new hub quests whenever one is posted.'
+                )
+            imgui.tree_pop()
+        end
+        if imgui.tree_node('Set Max Lv At Current Research Lv') then
+            imgui.text(
+                'When enabled mod will auto set Random Anomly Investigations Max Lv setting\nto current research level.'
                 )
             imgui.tree_pop()
         end
@@ -354,13 +356,6 @@ function config_menu.draw()
         if imgui.tree_node('Randomizer Settings') then
             if imgui.tree_node('Reset list') then
                 imgui.text('Resets list of posted quests.')
-                imgui.tree_pop()
-            end
-            imgui.tree_pop()
-        end
-        if imgui.tree_node('GUI Settings') then
-            if imgui.tree_node('Restore GUI') then
-                imgui.text('Unhides GUI and restores ui volume if something went wrong.')
                 imgui.tree_pop()
             end
             imgui.tree_pop()
