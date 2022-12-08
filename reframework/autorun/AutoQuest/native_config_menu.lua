@@ -8,6 +8,7 @@ local randomizer
 local dump
 local vars
 local methods
+local singletons
 
 local mod_menu_api_package_name = "ModOptionsMenu.ModMenuApi"
 
@@ -15,6 +16,7 @@ local native_UI = nil
 local mod_menu = nil
 
 local random_changed = false
+local changed = false
 
 native_config_menu.show_quest_ranks = false
 native_config_menu.show_quest_categories = false
@@ -28,10 +30,6 @@ native_config_menu.show_other = false
 native_config_menu.show_anomaly_investigations_options = false
 native_config_menu.show_hub_quest_options = false
 native_config_menu.randomizer_options_toggle = false
-native_config_menu.timer = 0
-native_config_menu.prev_timer = 0
-native_config_menu.active = false
-
 
 local posting_methods_descs = {
 						'Posts quests for singleplayer ONLY, faster than multiplayer method.',
@@ -72,7 +70,7 @@ function native_config_menu.draw()
 	local button
 	local option_window = methods.get_options_window:call(singletons.guiman)
 	local cursor = option_window:get_field('<OptionMenuListCursor>k__BackingField')
-	native_config_menu.timer = native_config_menu.timer + methods.get_delta_time:call(nil)
+	native_config_menu.active = true
 
 	if random_changed and methods.menu_list_cursor_get_index:call(cursor) < 22 then
 		randomizer.filter_quests()
@@ -202,17 +200,9 @@ function native_config_menu.draw()
 
 	if button then
 
-		if not vars.error then
-
-			config.save()
-			vars.post_quest_trigger = true
-			bind.block = false
-
-		else
-
-			vars.error = false
-
-		end
+		config.save()
+		vars.post_quest_trigger = true
+		bind.block = false
 
 	end
 
@@ -314,6 +304,22 @@ function native_config_menu.draw()
 																		nil,
 																		"Random Anomaly Investigation Target"
 																		)
+			_,config.current.auto_quest.anomaly_investigation_hunter_num = mod_menu.Options(
+																		"Party Size",
+																		config.current.auto_quest.anomaly_investigation_hunter_num,
+																		dump.hunter_num_array,
+																		nil,
+																		""
+																		)
+			changed,config.current.auto_quest.anomaly_investigation_cap_max_lvl = mod_menu.CheckBox(
+																'Set Max Lv At Current Research Lv',
+																config.current.auto_quest.anomaly_investigation_cap_max_lvl,
+																""
+																)
+			if changed and config.current.auto_quest.anomaly_investigation_cap_max_lvl then
+				functions.set_random_myst_lvl_to_max()
+				mod_menu.Repaint()
+			end
 		end
 
 	end
@@ -417,7 +423,7 @@ function native_config_menu.draw()
 
     end
 
-    if config.current.auto_quest.posting_method == 1 then
+    if config.current.auto_quest.posting_method ~= 3 then
 
 		_,config.current.auto_quest.auto_depart = mod_menu.CheckBox(
 																'Auto Depart',
@@ -430,7 +436,7 @@ function native_config_menu.draw()
     	mod_menu.Label(
 				"<COL GRAY>Auto Depart</COL>",
 				config.current.auto_quest.auto_depart and '☒' or '☐',
-				"Singleplayer Method only."
+				"Singleplayer and Multiplayer Method only."
 				)
 
     end
@@ -441,39 +447,6 @@ function native_config_menu.draw()
 														"Enable/Disable hiding quest info displayed in top "..
 														"left corner and while signing for Hub quest."
 														)
-
-
-
-
-	mod_menu.Header("Gui")
-
-	if config.current.auto_quest.posting_method == 1 then
-
-	    _,config.current.gui.hide_gui = mod_menu.CheckBox(
-													'Hide Gui',
-													config.current.gui.hide_gui,
-													"Enable/Disable hiding gui while posting."
-													)
-	    _,config.current.gui.mute_ui_sounds = mod_menu.CheckBox(
-															'Mute UI',
-															config.current.gui.mute_ui_sounds,
-															"Enable/Disable muting ui sounds while posting."
-															)
-
-	else
-
-		mod_menu.Label(
-				"<COL GRAY>Hide Gui</COL>",
-				config.current.gui.hide_gui and '☒' or '☐',
-				"Singleplayer Method only."
-				)
-		mod_menu.Label(
-				"<COL GRAY>Mute UI</COL>",
-				config.current.gui.mute_ui_sounds and '☒' or '☐',
-				"Singleplayer Method only."
-				)
-
-	end
 
 	mod_menu.Header("Randomizer")
 
@@ -1159,6 +1132,7 @@ function native_config_menu.init()
 	randomizer = require("AutoQuest.randomizer")
 	vars = require("AutoQuest.Common.vars")
 	methods = require("AutoQuest.methods")
+	singletons = require("AutoQuest.singletons")
 
 	if native_config_menu.is_module_available(mod_menu_api_package_name) then
 		mod_menu = require(mod_menu_api_package_name)
@@ -1181,15 +1155,8 @@ function native_config_menu.init()
 	)
 
 	re.on_frame(function()
-		if native_config_menu.timer ~= native_config_menu.prev_timer then
-			native_config_menu.prev_timer = native_config_menu.timer
-			native_config_menu.active = true
-		else
-			if native_config_menu.active then
-	    		bind.listen_trigger = false
-	    		bind.new_bind_trigger = false
-	    		bind.timer = 0
-	    	end
+		if native_config_menu.active
+		and not methods.is_open_startmenu:call(singletons.guiman) then
 			native_config_menu.active = false
 		end
 	end
