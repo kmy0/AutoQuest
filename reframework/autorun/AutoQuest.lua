@@ -66,7 +66,6 @@ re.on_frame(function()
     if config_menu.is_opened then
         pcall(config_menu.draw)
     end
-
     if vars.posting_method_changed then
         switch_posting_method()
         vars.posting_method_changed = false
@@ -78,3 +77,4 @@ re.on_config_save(function()
     config.save()
 end
 )
+
