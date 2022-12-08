@@ -1,6 +1,5 @@
 local vars = {}
 
-vars.ui_vol = nil
 vars.posting = false
 vars.interact_trigger = false
 vars.selected = false
@@ -14,7 +13,6 @@ vars.post_quest_trigger = false
 vars.posting_method_changed = false
 vars.prev_game_state = nil
 vars.game_state = nil
-vars.error = false
 vars.quest_type = nil
 vars.matching = false
 
