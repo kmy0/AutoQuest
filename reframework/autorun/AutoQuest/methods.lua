@@ -41,6 +41,7 @@ methods.get_quest_data_quest_counter = questman_type_def:get_method('getQuestDat
 methods.quest_activate = questman_type_def:get_method('questActivate')
 methods.get_quest_no_array = questman_type_def:get_method('getQuestNumberArray')
 methods.quest_start = questman_type_def:get_method('questStart')
+methods.get_monster_min_lvl_appearance = questman_type_def:get_method('getRandomMysteryAppearanceMainEmLevel')
 
 local quest_data_type_def = sdk.find_type_definition('snow.quest.QuestData')
 methods.get_quest_level = quest_data_type_def:get_method('getQuestLvEx')
