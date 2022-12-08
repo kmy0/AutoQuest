@@ -4,6 +4,7 @@ local config
 local singletons
 local methods
 local config_menu
+local vars
 
 bind.timer_max = 5000
 bind.timer = 0
@@ -450,7 +451,7 @@ function bind.listen()
 	if bind.hard_kb then
 		for key, key_name in pairs(bind.listen_valid_keys) do
 			if methods.check_kb_btn:call(bind.hard_kb, key) then
-				text = tostring(config.current.auto_quest.quest_no)
+				local text = tostring(config.current.auto_quest.quest_no)
 				if key == 8 then
 					if #text > 0 then
 						text = text:sub(1, -2)
