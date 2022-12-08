@@ -32,8 +32,8 @@ native_config_menu.show_hub_quest_options = false
 native_config_menu.randomizer_options_toggle = false
 
 local posting_methods_descs = {
-						'Posts quests for singleplayer ONLY, faster than multiplayer method.',
-						'Posts quests for multiplayer and singleplayer, slower than singleplayer method.',
+						'Posts quests for singleplayer ONLY, faster than Quest Counter Mode.',
+						'Posts quests for multiplayer and singleplayer, slower than Speedrun Mode.',
 						'Joins Hub quests or multiplayer queues.'
 }
 
@@ -89,9 +89,6 @@ function native_config_menu.draw()
 
 	mod_menu.Label("Created by: <COL RED>kmy</COL>", "")
 	mod_menu.Label("Version: <COL RED>" ..config.version.."<COL>","")
-
-
-
 
 	mod_menu.Header("Buttons")
 
@@ -170,23 +167,23 @@ function native_config_menu.draw()
 		mod_menu.Label(
 					"<COL GRAY>Quest ID</COL>",
 					config.current.auto_quest.quest_no,
-					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 					)
 		mod_menu.Label(
 					"<COL GRAY>Randomize</COL>",
 					"",
-					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 					)
 		mod_menu.Label(
 					not native_config_menu.randomizer_options_toggle and "<COL GRAY>Select Randomizer Chekboxes</COL>"
 					or native_config_menu.randomizer_options_toggle and "<COL GRAY>Unselect Randomizer Chekboxes</COL>",
 					"",
-					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 					)
 		mod_menu.Label(
 					"<COL GRAY>Reload Quest Data</COL>",
 					"",
-					"Multiplayer, Singleplayer Methods only."
+					"Quest Counter, Speedrun Modes only."
 					)
 
 	end
@@ -233,11 +230,11 @@ function native_config_menu.draw()
 	mod_menu.Header("General")
 
 	changed,config.current.auto_quest.posting_method = mod_menu.Options(
-																	"Posting Method",
+																	"Mode",
 																	config.current.auto_quest.posting_method,
 																	config_menu.post_methods,
 																	posting_methods_descs,
-																	"Choose your Posting Method."
+																	"Choose your Mode."
 																	)
 
 	if changed then vars.posting_method_changed = true end
@@ -247,7 +244,7 @@ function native_config_menu.draw()
 		mod_menu.Label(
 					"<COL GRAY>Quest Type</COL>",
 					config_menu.join_multi_types[ config.current.auto_quest.join_multi_type ],
-					"Join Multiplayer Method only."
+					"Quest Board Mode only."
 					)
 
 	else
@@ -380,7 +377,7 @@ function native_config_menu.draw()
     	mod_menu.Label(
 				"<COL GRAY>Auto Randomize Quest</COL>",
 				config.current.auto_quest.auto_randomize and '☒' or '☐',
-				"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+				"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 				)
 
     end
@@ -399,7 +396,7 @@ function native_config_menu.draw()
     	mod_menu.Label(
 	    		"<COL GRAY>Keep RNG</COL>",
 	    		config.current.auto_quest.keep_rng and '☒' or '☐',
-	    		"Multiplayer, Singleplayer Methods only."
+	    		"Quest Counter, Speedrun Modes only."
 	    		)
 
     end
@@ -418,7 +415,7 @@ function native_config_menu.draw()
     	mod_menu.Label(
 				"<COL GRAY>Send Join Request</COL>",
 				config.current.auto_quest.send_join_request and '☒' or '☐',
-				"Multiplayer Method only."
+				"Quest Counter Mode only."
 				)
 
     end
@@ -436,7 +433,7 @@ function native_config_menu.draw()
     	mod_menu.Label(
 				"<COL GRAY>Auto Depart</COL>",
 				config.current.auto_quest.auto_depart and '☒' or '☐',
-				"Singleplayer and Multiplayer Method only."
+				"Speedrun and Quest Counter Mode only."
 				)
 
     end
@@ -455,7 +452,7 @@ function native_config_menu.draw()
 		mod_menu.Label(
 				"<COL GRAY>Quest Ranks</COL>",
 				'',
-				"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+				"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 				)
 
 	else
@@ -583,7 +580,7 @@ function native_config_menu.draw()
 		mod_menu.Label(
 					"<COL GRAY>Quest Categories</COL>",
 					'',
-					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 					)
 
 	else
@@ -959,7 +956,7 @@ function native_config_menu.draw()
 		mod_menu.Label(
 					"<COL GRAY>Quest Types</COL>",
 					'',
-					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 					)
 
 	else
@@ -1022,7 +1019,7 @@ function native_config_menu.draw()
 		mod_menu.Label(
 					"<COL GRAY>Other</COL>",
 					'',
-					"Multiplayer, Singleplayer Methods and Join Multiplayer Specific Quest only."
+					"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 					)
 
 	else
