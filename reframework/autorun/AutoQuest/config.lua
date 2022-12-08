@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.4.8'
+config.version = '1.4.9'
 
 config.default  = {
     auto_quest={
@@ -19,6 +19,8 @@ config.default  = {
         anomaly_investigation_min_lv=1,
         anomaly_investigation_max_lv=200,
         anomaly_investigation_monster=1,
+        anomaly_investigation_hunter_num=1,
+        anomaly_investigation_cap_max_lvl=true,
         quest_no=''
     },
     randomizer={
