@@ -2,6 +2,7 @@ local randomizer = {}
 local dump
 local config
 local functions
+local methods
 
 randomizer.filtered_quest_list = {}
 randomizer.research_request = {}
@@ -113,14 +114,12 @@ function randomizer.roll()
 
     if #randomizer.filtered_quest_list == 0 then
         functions.error_handler("There are no quests to randomize.\nTurn off some exclusions.")
-        return false
     else
         if config.current.randomizer.prefer_research_target and #randomizer.research_request ~= 0 then
             config.current.auto_quest.quest_no = randomizer.research_request[ math.random(#randomizer.research_request) ]
         else
             config.current.auto_quest.quest_no = randomizer.filtered_quest_list[ math.random(#randomizer.filtered_quest_list) ]
         end
-        return true
     end
 
 end
