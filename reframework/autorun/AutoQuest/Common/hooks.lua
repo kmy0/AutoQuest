@@ -34,12 +34,24 @@ function common_hooks.hook()
 	    end
 	)
 
+    sdk.hook(methods.decide_button,function(args)end,
+        function(retval)
+            if vars.decide_trigger then
+                vars.decide_trigger = false
+                if vars.posting then
+                	return sdk.to_ptr(true)
+                else
+                	return retval
+                end
+            else
+                return retval
+            end
+        end
+    )
+
 	sdk.hook(methods.quest_activate,function(args)end,
 	    function(retval)
 	        config.current.auto_quest.quest_no = singletons.questman:get_field('_QuestIdentifier'):get_field('_QuestNo')
-            if vars.posting then
-	            vars.close_trigger = true
-	        end
 	    end
 	)
 
@@ -106,7 +118,9 @@ function common_hooks.hook()
 		                dump.quest_data_list[no]['completed'] = methods.is_quest_clear:call(singletons.progquestman,no)
 		            end
 		        end
-
+		        if config.current.auto_quest.anomaly_investigation_cap_max_lvl then
+		        	functions.set_random_myst_lvl_to_max()
+		        end
 		        if config.current.auto_quest.auto_post then vars.post_quest_trigger = true end
 			end
 		end
