@@ -9,9 +9,9 @@ local bind = require("AutoQuest.bind")
 local common_hooks = require("AutoQuest.Common.hooks")
 local dump = require("AutoQuest.dump")
 local randomizer = require("AutoQuest.randomizer")
-local join_multiplayer = require("AutoQuest.Posting_Methods.join_multiplayer")
-local singleplayer = require("AutoQuest.Posting_Methods.singleplayer")
-local multiplayer = require("AutoQuest.Posting_Methods.multiplayer")
+local quest_board = require("AutoQuest.Modes.quest_board")
+local speedrun = require("AutoQuest.Modes.speedrun")
+local quest_counter = require("AutoQuest.Modes.quest_counter")
 local mystery_mode = require("AutoQuest.mystery_mode")
 
 singletons.init()
@@ -28,18 +28,20 @@ bind.init()
 config_menu.init()
 native_config_menu.init()
 
-multiplayer.init()
-singleplayer.init()
-join_multiplayer.init()
+quest_counter.init()
+speedrun.init()
+quest_board.init()
 
 
 local function switch_posting_method()
+    singletons.quest_counter = nil
+    singletons.quest_board = nil
     if config.current.auto_quest.posting_method == 2 then
-        multiplayer.switch()
+        quest_counter.switch()
     elseif config.current.auto_quest.posting_method == 1 then
-        singleplayer.switch()
+        speedrun.switch()
     elseif config.current.auto_quest.posting_method == 3 then
-        join_multiplayer.switch()
+        quest_board.switch()
     end
     randomizer.filter_quests()
 end
@@ -77,4 +79,3 @@ re.on_config_save(function()
     config.save()
 end
 )
-
