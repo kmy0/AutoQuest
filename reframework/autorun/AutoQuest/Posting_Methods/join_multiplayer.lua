@@ -5,158 +5,129 @@ local methods
 local config
 local functions
 local dump
+local randomizer
 
-local quest_counter_type_def = sdk.find_type_definition('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
-local quest_counter_menu_type_def = sdk.find_type_definition('snow.gui.fsm.questcounter.GuiQuestCounterMenu')
 local menu_list_type_def = sdk.find_type_definition('snow.gui.SnowGuiCommonBehavior.MenuListCtrlBase')
 
-local auto_join_trigger = false
-local auto_join_timer = 0
-local auto_join_timer_min = 500
-local auto_join_timer_max = 2000
-local order_index = 1
-local quest_board_quest_list_index = 0
-local quest_counter_menu_index = 1
-local set_ano_inv_fields = true
-local menu_type = nil
 local hall_status = nil
-local quest_board_open = false
-local get_menu = false
-local set_research_target_lvl = false
 
+local auto_join = {
+    trigger=false,
+    currnt=0,
+    min=500,
+    max=2500
+}
+local actions = {
+    select_menu=true,
+    set_random_mystery_fields=true,
+    start_random_mystery_matchmaking=true,
+    select_hub_quest_slot=true
+}
+local indexes = {
+    order=1,
+    hub_quest_list=0
+}
 local quest_board_menu_fields = {
                     top={
                         menu_list='<QuestCounterTopMenuList>k__BackingField',
-                        cursor='<TopMenuCursor>k__BackingField',
-                        type_def=quest_counter_type_def
+                        cursor='<TopMenuCursor>k__BackingField'
                     },
                     sub={
                         menu_list='<QuestCounterSubMenuList>k__BackingField',
-                        cursor='<SubMenuCursor>k__BackingField',
-                        type_def=quest_counter_type_def
+                        cursor='<SubMenuCursor>k__BackingField'
                     },
                     level={
                         menu_list='<QuestLevelMenuList>k__BackingField',
-                        cursor='<LevelMenuCursor>k__BackingField',
-                        type_def=quest_counter_type_def
-                    },
-                    quest_counter_menu={
-                        menu_list=nil,
-                        cursor='<ParticipationTopCursor>k__BackingField',
-                        type_def=quest_counter_menu_type_def
-                    },
-                    quest_counter_menu_clickthrough={
-                        menu_list=nil,
-                        cursor='<ParticipationTopCursor>k__BackingField',
-                        type_def=quest_counter_menu_type_def
-                    },
-                    quest_counter_submenu={
-                        menu_list=nil,
-                        cursor='<ParticipationSubCursor>k__BackingField',
-                        type_def=quest_counter_menu_type_def
+                        cursor='<LevelMenuCursor>k__BackingField'
                     }
 }
-
 local quest_board_menu_id = {
                         [2]={ --investigations
                             top=13,
                             sub=5,
-                            quest_counter_menu={2,0,1,5},
-                            quest_counter_submenu='get_monster_index',
-                            set_menu_fields='set_menu_fields',
                             order={
                                 'top',
-                                'sub',
-                                'quest_counter_menu',
-                                'quest_counter_submenu',
-                                'set_menu_fields',
-                                'quest_counter_menu',
-                                'quest_counter_menu_clickthrough',
-                                'quest_counter_menu',
-                                'quest_counter_menu_clickthrough',
-                                'quest_counter_menu'
+                                'sub'
+                            },
+                            id={
+                                top=32,
+                                sub=16
                             }
                         },
                         [3]={ --anomaly
                             top=13,
                             sub=6,
                             level=8,
-                            order={'top','sub','level'}
+                            order={
+                                'top',
+                                'sub',
+                                'level'
+                            },
+                            id={
+                                top=32,
+                                sub=1
+                            }
                         },
                         [4]={ --master
                             top=12,
                             level=8,
-                            order={'top','level'}
+                            order={
+                                'top',
+                                'level'},
+                            id={top=1}
                         },
                         [5]={ --high
                             top=20,
                             sub=0,
                             level=8,
-                            order={'top','sub','level'}
+                            order={
+                                'top',
+                                'sub',
+                                'level'
+                            },
+                            id={
+                                top=32,
+                                sub=1
+                            }
                         },
                         [6]={ --low
                             top=20,
                             sub=1,
                             level=8,
-                            order={'top','sub','level'}
+                            order={
+                                'top',
+                                'sub',
+                                'level'
+                            },
+                            id={
+                                top=32,
+                                sub=1
+                            }
                         },
                         [7]={ --specific
                             top=12,
-                            order={'top'}
+                            order={'top'},
+                            id={top=1}
                         }
 }
 
-local function set_random_mystery_fields()
-    local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
-    local quest_counter_menu = quest_counter_singleton:get_field('<QuestCounterMenu>k__BackingField')
-    local max_lvl = config.current.auto_quest.anomaly_investigation_max_lv
-    local min_lvl = config.current.auto_quest.anomaly_investigation_min_lv
 
-    if set_research_target_lvl and min_lvl < set_research_target_lvl then
-        min_lvl = set_research_target_lvl
-    end
+local function get_quest_board_menu(target_id,target_field)
+    local menu = {}
+    menu.list = singletons.quest_counter:get_field(quest_board_menu_fields[target_field]['menu_list'])
+    menu.size = menu.list:get_field('mSize')
 
-    if max_lvl < min_lvl then
-        max_lvl = min_lvl
-    end
+    if menu.size == 0 then return false end
 
-    quest_counter_menu:set_field("_LevelMin",min_lvl)
-    quest_counter_menu:set_field("_LevelMax",max_lvl)
-end
+    vars.cursor = singletons.quest_counter:get_field(quest_board_menu_fields[target_field]['cursor'])
+    menu.cursor_index = methods.menu_list_cursor_get_index:call(vars.cursor)
 
-local function get_quest_counter_menu(target_id,target_type)
-    local type_def = quest_board_menu_fields[target_type]['type_def']
-    vars.cursor = type_def:get_field( quest_board_menu_fields[target_type]['cursor'] ):get_data()
-    local cursor_index = methods.menu_list_cursor_get_index:call(vars.cursor)
-
-    if cursor_index == target_id or target_id == nil then
+    if menu.list:get_Item(menu.cursor_index) == target_id then
         vars.selected = true
         return true
     else
-        methods.menu_list_cursor_set_index:call(vars.cursor,target_id)
-        vars.selection_trigger = target_id
-        return true
-    end
-end
-
-local function get_quest_board_menu(target_id,target_type)
-    local type_def = quest_board_menu_fields[target_type]['type_def']
-    local quest_counter_menu_list = type_def:get_field(quest_board_menu_fields[target_type]['menu_list']):get_data()
-    local quest_counter_menu_list_size = quest_counter_menu_list:get_field('mSize')
-
-    if quest_counter_menu_list_size == 0 then return nil end
-
-    vars.cursor = type_def:get_field(quest_board_menu_fields[target_type]['cursor']):get_data()
-    local cursor_index = methods.menu_list_cursor_get_index:call(vars.cursor)
-    local menu_id = quest_counter_menu_list:call('get_Item',cursor_index)
-
-    if menu_id == target_id then
-        vars.selected = true
-        return true
-    else
-        for i=0,quest_counter_menu_list_size-1 do
-            local menu_id = quest_counter_menu_list:call('get_Item',i)
-            if menu_id  == target_id then
+        for i=0,menu.size-1 do
+            if menu.list:get_Item(i) == target_id then
                 methods.menu_list_cursor_set_index:call(vars.cursor,i)
                 vars.selection_trigger = i
                 return true
@@ -167,8 +138,7 @@ local function get_quest_board_menu(target_id,target_type)
 end
 
 local function check_posted_quests()
-    local hunter_info = functions.to_array(singletons.lobbyman:get_field('_hunterInfo'))
-    for _,hunter in pairs(hunter_info) do
+    for _,hunter in pairs(functions.to_array(singletons.lobbyman:get_field('_hunterInfo'))) do
         if hunter then
             local status = hunter:get_field('_hallStatus')
             if status == 2 or status == 5 or status == 6 then
@@ -189,144 +159,77 @@ local function get_quest_max_join(quest_data)
     end
 end
 
-local function get_monster_list_index()
-    local quest_counter_singleton = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
-    local quest_counter_menu = quest_counter_singleton:get_field('<QuestCounterMenu>k__BackingField')
-    local monster_list = quest_counter_menu:get_field('SubMenuItemsEmTypesList')
-    local monster_id = 0
-    set_research_target_lvl = false
+local function set_random_mystery_fields()
+    local settings = {
+        max_lvl=config.current.auto_quest.anomaly_investigation_max_lv,
+        min_lvl=config.current.auto_quest.anomaly_investigation_min_lv,
+        hunter_num=tonumber(dump.hunter_num_array[config.current.auto_quest.anomaly_investigation_hunter_num]),
+        monster=dump.anomaly_investigations_main_monsters[
+                    dump.anomaly_investigations_main_monsters_array[
+                        config.current.auto_quest.anomaly_investigation_monster
+                        ]
+                    ]
+    }
 
     if config.current.auto_quest.anomaly_investigation_monster == 2 then
         local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
         local research_request = methods.get_research_target:call(mysterylabo)
 
         if research_request then
-            monster_id = research_request:get_field('_MainTargetEnemyType')
-            set_research_target_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
-        else
-            index = 0
-        end
-    else
-        monster_id = dump.anomaly_investigations_main_monsters[
-                                                    dump.anomaly_investigations_main_monsters_array[
-                                                                            config.current.auto_quest.anomaly_investigation_monster
-                                                                            ]
-                                                    ]
-    end
-
-    local index = monster_list:call('IndexOf',monster_id)
-    if index == -1 then index = 0 end
-
-    if config.current.auto_quest.anomaly_investigation_monster == 2 and index == 0 then
-        set_research_target_lvl = false
-    end
-
-    return index
-end
-
-local function join_random_quest_get_menu(menu_id,menu_type)
-    return get_quest_board_menu(menu_id,menu_type)
-end
-
-local function join_random_mystery_get_menu(menu_id,menu_type)
-    if type(menu_id) == 'table' then
-        menu_id = menu_id[quest_counter_menu_index]
-    end
-
-    if menu_id == 'get_monster_index' then
-        menu_id = get_monster_list_index()
-    elseif menu_id == 'set_menu_fields' then
-        set_random_mystery_fields()
-        vars.selected = true
-        return true
-    end
-
-    if quest_board_menu_fields[menu_type]['menu_list'] then
-        return get_quest_board_menu(menu_id,menu_type)
-    else
-        return get_quest_counter_menu(menu_id,menu_type)
-    end
-end
-
-local function join_hall_quest_get_menu()
-    local quest_board = methods.get_quest_board:call(singletons.guiman)
-    local quest_board_quest_list = quest_board:get_field('_QuestBoardListCtrl')
-
-    if not vars.selection_trigger then
-        vars.cursor = menu_list_type_def:get_field('_Cursor'):get_data(quest_board_quest_list)
-        methods.menu_list_cursor_set_index:call(vars.cursor,quest_board_quest_list_index)
-        vars.selection_trigger = quest_board_quest_list_index
-    end
-
-    if vars.selected then
-        local hunter_info = methods.get_selected_hunter_info:call(quest_board_quest_list)
-        vars.selected = false
-        if hunter_info then
-            if methods.quest_check:call(quest_board_quest_list,quest_board_quest_list_index) == 0 then
-                local quest_board_member_list = quest_board:get_field('_MemberListCtrl')
-                local quest_board_member_scroll_list = quest_board_member_list:get_field('_MemberList')
-                local quest_member_count = quest_board_member_scroll_list:get_field('_QuestMemberInfoList'):call('get_Count')
-                local quest_data = quest_board_member_scroll_list:get_field('_QuestData')
-                if quest_data then
-                    local quest_member_max = get_quest_max_join(quest_data)
-
-                    if quest_member_count < quest_member_max then
-                        hall_status = hunter_info
-                        return true,nil
-                    else
-                        quest_board_quest_list_index = quest_board_quest_list_index + 1
-                    end
+            settings.monster = research_request:get_field('_MainTargetEnemyType')
+            settings.min_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
+            if settings.max_lvl < settings.min_lvl then
+                settings.max_lvl = methods.get_mystery_research_level:call(singletons.progman)
+                if settings.max_lvl < settings.min_lvl then
+                    settings.max_lvl = settings.min_lvl
                 end
-
-            else
-                quest_board_quest_list_index = quest_board_quest_list_index + 1
-            end
-        else
-            if quest_board_quest_list_index == 0 then
-                return false,"No quests to join."
-            else
-                return false,"All quests are full."
             end
         end
+    else
+        if settings.max_lvl < settings.min_lvl then
+            settings.max_lvl,settings.min_lvl = settings.min_lvl,settings.max_lvl
+        end
     end
-    if quest_board_quest_list_index == 3 then
-        return false,"All quests are full."
-    end
+
+    singletons.quest_counter:set_field('<_BoardLevelMin>k__BackingField',settings.min_lvl)
+    singletons.quest_counter:set_field('<_BoardLevelMax>k__BackingField',settings.max_lvl)
+    singletons.quest_counter:set_field('<_BoardOrderNum>k__BackingField',settings.hunter_num)
+    singletons.quest_counter:set_field('<_BoardEnemyType>k__BackingField',settings.monster)
+    singletons.quest_counter:set_field('<_BoardSearchSave>k__BackingField',true)
+    methods.save_random_mystery_search_info:call(singletons.quest_counter)
 end
 
 function join_multiplayer.switch()
     function functions.post_quest()
-        local random_pool = true
-        local quest_data = nil
-        if methods.can_open_quest_board:call(singletons.guiman) and not methods.is_quest_posted:call(singletons.questman) then
+        if methods.can_open_quest_board:call(singletons.guiman)
+        and not methods.is_quest_posted:call(singletons.questman) then
+
             if config.current.auto_quest.posting_method == 3
-            and config.current.auto_quest.join_multi_type == 7 then
-                if config.current.auto_quest.auto_randomize then
-                    random_pool = randomizer.roll()
-                end
-                quest_data = dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)]
+            and config.current.auto_quest.join_multi_type == 7
+            and config.current.auto_quest.auto_randomize then
+                randomizer.roll()
             end
 
-            if config.current.auto_quest.join_multi_type == 1 and not methods.is_online:call(singletons.lobbyman) then
+            if config.current.auto_quest.join_multi_type == 1
+            and not methods.is_online:call(singletons.lobbyman) then
                 functions.error_handler("Can't join hub quests while not in the lobby.")
-            elseif config.current.auto_quest.join_multi_type == 1 and not check_posted_quests() then
+            elseif config.current.auto_quest.join_multi_type == 1
+            and not check_posted_quests() then
                 functions.error_handler("No quests to join.")
             elseif config.current.auto_quest.posting_method == 3
             and config.current.auto_quest.join_multi_type == 7
-            and not random_pool then
+            and config.current.auto_quest.auto_randomize
+            and #randomizer.filtered_quest_list == 0 then
                 return
             elseif config.current.auto_quest.posting_method == 3
             and config.current.auto_quest.join_multi_type == 7
-            and not quest_data then
+            and not dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)] then
                 functions.error_handler("Invalid Quest ID.")
             elseif config.current.auto_quest.posting_method == 3
             and config.current.auto_quest.join_multi_type == 7
             and not dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)]['online'] then
                 functions.error_handler("Cant be played online.")
             else
-                order_index = 1
-                quest_counter_menu_index = 1
-                quest_board_quest_list_index = 0
                 vars.posting = true
                 functions.open_quest_board()
             end
@@ -338,15 +241,13 @@ function join_multiplayer.hook()
     sdk.hook(methods.quest_board_top_start,function(args)end,
         function(retval)
             if config.current.auto_quest.posting_method == 3 then
-                if vars.posting and not quest_board_open then
-                    local quest_board = methods.get_quest_board:call(singletons.guiman)
+                if vars.posting and not singletons.quest_board then
+                    singletons.quest_board = methods.get_quest_board:call(singletons.guiman)
                     if config.current.auto_quest.join_multi_type ~= 1 then
-                        methods.quest_board_decide_quick:call(quest_board,0,1)
+                        methods.quest_board_decide_quick:call(singletons.quest_board,0,1)
                     else
-                        methods.quest_board_decide_hall:call(quest_board,0,0)
+                        methods.quest_board_decide_hall:call(singletons.quest_board,0,0)
                     end
-                    get_menu = true
-                    quest_board_open = true
                 end
             else
                 return retval
@@ -356,7 +257,9 @@ function join_multiplayer.hook()
 
     sdk.hook(methods.check_quest_hr,function(args)end,
         function(retval)
-            if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 and vars.posting then
+            if config.current.auto_quest.posting_method == 3
+            and config.current.auto_quest.join_multi_type == 7
+            and vars.posting then
                 return sdk.to_ptr(true)
             else
                 return retval
@@ -366,7 +269,9 @@ function join_multiplayer.hook()
 
     sdk.hook(methods.get_quest_data_quest_counter,
         function(args)
-            if vars.posting and config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
+            if vars.posting
+            and config.current.auto_quest.posting_method == 3
+            and config.current.auto_quest.join_multi_type == 7 then
                 args[3] = sdk.to_ptr(tonumber(config.current.auto_quest.quest_no))
             end
         end
@@ -383,131 +288,16 @@ function join_multiplayer.hook()
                         methods.request_ready:call(singletons.lobbyman)
                     end
                 end
-                quest_board_open = false
+                for k,_ in pairs(actions) do actions[k] = true end
+                indexes.order = 1
+                indexes.hub_quest_list = 0
+                singletons.quest_counter = nil
+                singletons.quest_board = nil
                 vars.close_trigger = false
                 vars.decide_trigger = false
                 vars.posting = false
-                hall_status = nil
-            end
-        end
-    )
-
-    sdk.hook(methods.quick_quest_match,
-        function(args)
-            vars.matching = true
-            if config.current.auto_quest.posting_method == 3
-            and config.current.auto_quest.join_multi_type ~= 1 then
-                if vars.posting and quest_board_open then
-                    vars.posting = false
-                    vars.decide_trigger = false
-                end
-            end
-        end
-    )
-
-    sdk.hook(methods.quest_session_action_end,
-        function(args)
-            if config.current.auto_quest.posting_method == 3 then
                 vars.matching = false
-            end
-        end
-    )
-
-
-    sdk.hook(methods.decide_button,function(args)end,
-        function(retval)
-            if config.current.auto_quest.posting_method == 3 then
-                if vars.posting then
-                    if config.current.auto_quest.join_multi_type ~= 1 then
-
-                        if get_menu then
-
-                            menu_type = quest_board_menu_id[config.current.auto_quest.join_multi_type]['order'][order_index]
-                            local menu_id = quest_board_menu_id[config.current.auto_quest.join_multi_type][menu_type]
-                            local bool = nil
-
-                            if config.current.auto_quest.join_multi_type == 2 then
-                                bool = join_random_mystery_get_menu(menu_id,menu_type)
-                            else
-                                bool = join_random_quest_get_menu(menu_id,menu_type)
-                            end
-
-                            if bool == false then
-                                vars.posting = false
-                                vars.close_trigger = true
-                                functions.error_handler("Can't join chosen quest type.")
-                            elseif bool == nil then
-                                vars.error = true
-                                vars.posting = false
-                                vars.close_trigger = true
-                                functions.error_handler("Something went wrong.")
-                            end
-
-                            get_menu = false
-
-                        end
-
-                        if vars.selected then
-                            vars.selected = false
-                            order_index = order_index + 1
-
-                            if menu_type == 'quest_counter_menu' then
-                                quest_counter_menu_index = quest_counter_menu_index + 1
-                            end
-
-                            if order_index <= #quest_board_menu_id[config.current.auto_quest.join_multi_type]['order'] then
-                                get_menu = true
-                            else
-                                vars.decide_trigger = true
-                            end
-
-                            if quest_board_menu_fields[menu_type] then
-                                return sdk.to_ptr(true)
-                            else
-                                return retval
-                            end
-                        end
-
-                    elseif config.current.auto_quest.join_multi_type == 1 then
-
-                        if get_menu then
-
-                            local bool = nil
-                            bool,error = join_hall_quest_get_menu()
-
-                            if bool ~= nil then
-                                get_menu = false
-                                if bool then
-                                    vars.decide_trigger = true
-                                elseif bool == false then
-                                    vars.posting = false
-                                    vars.close_trigger = true
-                                    functions.error_handler(error)
-                                end
-                            end
-
-                        end
-
-                    end
-
-                    if vars.selected == nil then
-                        vars.posting = false
-                        vars.close_trigger = true
-                        functions.error_handler("Menu selection timeout.")
-                    end
-
-                    if vars.decide_trigger then
-                        return sdk.to_ptr(true)
-                    else
-                        return retval
-                    end
-
-                else
-                    return retval
-                end
-
-            else
-                return retval
+                hall_status = nil
             end
         end
     )
@@ -515,27 +305,172 @@ function join_multiplayer.hook()
     sdk.hook(methods.recieve_chat_info,
         function(args)
             if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
-                local guid = sdk.to_managed_object(args[3]):get_field('_textId')
-                if methods.get_hash_code:call(guid) == 56971447 then
-                    auto_join_trigger = true
+                if methods.get_hash_code:call(sdk.to_managed_object(args[3]):get_field('_textId')) == 56971447 then
+                    auto_join.trigger = true
                 end
             end
         end
     )
 
     re.on_frame(function()
+        if config.current.auto_quest.posting_method == 3 then
+            if vars.posting then
+
+                if config.current.auto_quest.join_multi_type ~= 1 then
+
+                    if not singletons.quest_counter then
+                        singletons.quest_counter = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
+                    end
+
+                    if singletons.quest_counter then
+
+                        if methods.is_open_info:call(singletons.guiman) then
+                            vars.posting = false
+                            vars.matching = true
+                        end
+
+                        if vars.selected then
+                            vars.selected = false
+                            vars.decide_trigger = true
+                        elseif vars.selected == nil then
+                            vars.posting = false
+                            vars.close_trigger = true
+                            functions.error_handler("Menu selection timeout.")
+                        end
+
+                        local menu = {}
+                        menu.order = quest_board_menu_id[config.current.auto_quest.join_multi_type]['order']
+                        menu.type = menu.order[indexes.order]
+                        menu.index = quest_board_menu_id[config.current.auto_quest.join_multi_type][menu.type]
+                        menu.id = quest_board_menu_id[config.current.auto_quest.join_multi_type]['id'][menu.type]
+                        menu.current = singletons.quest_counter:get_field('<QuestCounterState>k__BackingField')
+
+                        if config.current.auto_quest.join_multi_type == 2
+                        and actions.set_random_mystery_fields then
+                            set_random_mystery_fields()
+                            actions.set_random_mystery_fields = false
+                        end
+
+                        if (
+                        config.current.auto_quest.join_multi_type ~= 2
+                        or
+                        config.current.auto_quest.join_multi_type == 2
+                        and not actions.start_random_mystery_matchmaking
+                        )
+                        and indexes.order > #menu.order then
+                            vars.decide_trigger = true
+                        elseif indexes.order > #menu.order
+                        and config.current.auto_quest.join_multi_type == 2
+                        and actions.start_random_mystery_matchmaking then
+                            methods.tree_set_node_by_id:call(
+                                singletons.quest_counter:get_field('<refQuestCounterBehaviorTree>k__BackingField'),
+                                1107141891,
+                                0,
+                                nil
+                                )
+                            actions.start_random_mystery_matchmaking = false
+                        else
+                            if actions.select_menu then
+                                if not get_quest_board_menu(menu.index,menu.type) then
+                                    vars.posting = false
+                                    vars.close_trigger = true
+                                    functions.error_handler("Can't join chosen quest type.")
+                                end
+                                actions.select_menu = false
+                            end
+                        end
+
+                        if (
+                        menu.current == menu.id
+                        or
+                        not menu.id
+                        )
+                        and indexes.order <= #menu.order then
+                            indexes.order = indexes.order + 1
+                            if indexes.order <= #menu.order then
+                                actions.select_menu = true
+                            end
+                        end
+                    end
+
+                elseif config.current.auto_quest.join_multi_type == 1
+                and singletons.quest_board then
+
+                    if methods.is_open_yn:call(singletons.guiman) then
+                        vars.decide_trigger = true
+                    else
+                        local quest = {}
+                        quest.list = singletons.quest_board:get_field('_QuestBoardListCtrl')
+
+                        if actions.select_hub_quest_slot then
+                            vars.cursor = menu_list_type_def:get_field('_Cursor'):get_data(quest.list)
+                            methods.menu_list_cursor_set_index:call(vars.cursor,indexes.hub_quest_list)
+                            vars.selection_trigger = indexes.hub_quest_list
+                            actions.select_hub_quest_slot = false
+                        end
+
+                        if vars.selected then
+                            vars.selected = false
+                            quest.hunter_info = methods.get_selected_hunter_info:call(quest.list)
+                            if quest.hunter_info then
+                                if methods.quest_check:call(quest.list,indexes.hub_quest_list) == 0 then
+                                    quest.member_list = singletons.quest_board:get_field('_MemberListCtrl')
+                                    quest.member_list_scroll = quest.member_list:get_field('_MemberList')
+                                    quest.member_count = quest.member_list_scroll:get_field('_QuestMemberInfoList'):get_Count()
+                                    quest.data = quest.member_list_scroll:get_field('_QuestData')
+                                    if quest.data then
+                                        quest.member_max = get_quest_max_join(quest.data)
+
+                                        if quest.member_count < quest.member_max then
+                                            hall_status = quest.hunter_info
+                                            vars.decide_trigger = true
+                                        else
+                                            indexes.hub_quest_list = indexes.hub_quest_list + 1
+                                            actions.select_hub_quest_slot = true
+                                        end
+                                    end
+
+                                else
+                                    indexes.hub_quest_list = indexes.hub_quest_list + 1
+                                    actions.select_hub_quest_slot = true
+                                end
+                            else
+                                if indexes.hub_quest_list == 0 then
+                                    quest.error = "No quests to join."
+                                else
+                                    quest.error = "All quests are full."
+                                end
+                            end
+                        end
+                        if indexes.hub_quest_list == 3 then
+                            quest.error = "All quests are full."
+                        end
+                        if quest.error then
+                            vars.posting = false
+                            vars.close_trigger = true
+                            functions.error_handler(quest.error)
+                        end
+                    end
+                end
+
+            end
+        end
+    end
+    )
+
+    re.on_frame(function()
         if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
-            if auto_join_trigger then
-                auto_join_timer = auto_join_timer + methods.get_delta_time:call(nil)
-                if auto_join_timer >= auto_join_timer_min then
+            if auto_join.trigger then
+                auto_join.current = auto.current + methods.get_delta_time:call(nil)
+                if auto_join.current >= auto_join.min then
                     if check_posted_quests() then
-                        auto_join_timer = 0
-                        auto_join_trigger = false
+                        auto_join.current = 0
+                        auto_join.trigger = false
                         vars.post_quest_trigger = true
                     else
-                        if auto_join_timer >= auto_join_timer_max then
-                            auto_join_timer = 0
-                            auto_join_trigger = false
+                        if auto_join.current >= auto_join.max then
+                            auto_join.current = 0
+                            auto_join.trigger = false
                         end
                     end
                 end
@@ -553,6 +488,7 @@ function join_multiplayer.init()
     functions = require("AutoQuest.Common.functions")
     config = require("AutoQuest.config")
     dump = require("AutoQuest.dump")
+    randomizer = require("AutoQuest.randomizer")
     join_multiplayer.hook()
 end
 
