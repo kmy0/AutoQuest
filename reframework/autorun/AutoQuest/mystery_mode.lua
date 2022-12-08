@@ -173,7 +173,7 @@ function mystery_mode.init()
 	config = require("AutoQuest.config")
 	singletons = require("AutoQuest.singletons")
 
-	if singletons.startmenuman and singletons.startmenuman:get_field('<isOpenStartMenu>k__BackingField') then mystery_mode.stop = true end
+	if singletons.guiman and methods.is_open_startmenu:call(singletons.guiman) then mystery_mode.stop = true end
 
 	mystery_mode.hook()
 end
