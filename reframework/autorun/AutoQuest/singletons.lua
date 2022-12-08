@@ -9,8 +9,11 @@ singletons.objaccman = nil
 singletons.lobbyman = nil
 singletons.hwpad = nil
 singletons.hwkb = nil
-singletons.startmenuman = nil
 singletons.facilitydataman = nil
+singletons.spacewatcher = nil
+singletons.quest_counter = nil
+singletons.quest_board = nil
+singletons.progman = nil
 
 
 function singletons.get_questman()
@@ -18,6 +21,13 @@ function singletons.get_questman()
         singletons.questman = sdk.get_managed_singleton('snow.QuestManager')
     end
     return singletons.questman
+end
+
+function singletons.get_progman()
+    if not singletons.progman then
+        singletons.progman = sdk.get_managed_singleton('snow.progress.ProgressManager')
+    end
+    return singletons.progman
 end
 
 function singletons.get_objaccman()
@@ -32,13 +42,6 @@ function singletons.get_lobbyman()
         singletons.lobbyman = sdk.get_managed_singleton('snow.LobbyManager')
     end
     return singletons.lobbyman
-end
-
-function singletons.get_wwiseman()
-    if not singletons.wwiseman then
-        singletons.wwiseman = sdk.get_managed_singleton('snow.wwise.SnowWwiseManager')
-    end
-    return singletons.wwiseman
 end
 
 function singletons.get_vilman()
@@ -90,13 +93,6 @@ function singletons.get_hwkb()
     return singletons.hwkb
 end
 
-function singletons.get_startmenuman()
-    if not singletons.startmenuman then
-        singletons.startmenuman = sdk.get_managed_singleton('snow.gui.fsm.startmenu.GuiStartMenuFsmManager')
-    end
-    return singletons.startmenuman
-end
-
 function singletons.get_facilitydataman()
     if not singletons.facilitydataman then
         singletons.facilitydataman = sdk.get_managed_singleton('snow.data.FacilityDataManager')
@@ -109,15 +105,14 @@ function singletons.init()
 	singletons.get_spacewatcher()
 	singletons.get_objaccman()
 	singletons.get_lobbyman()
-	singletons.get_wwiseman()
 	singletons.get_vilman()
 	singletons.get_chatman()
 	singletons.get_guiman()
 	singletons.get_progquestman()
 	singletons.get_hwpad()
 	singletons.get_hwkb()
-    singletons.get_startmenuman()
     singletons.get_facilitydataman()
+    singletons.get_progman()
 end
 
 return singletons
