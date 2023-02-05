@@ -10,10 +10,11 @@ local randomizer
 local menu_list_type_def = sdk.find_type_definition('snow.gui.SnowGuiCommonBehavior.MenuListCtrlBase')
 
 local hall_status = nil
+local quest_board_rank = 'master'
 
 local auto_join = {
     trigger=false,
-    currnt=0,
+    current=0,
     min=500,
     max=2500
 }
@@ -28,87 +29,118 @@ local indexes = {
     hub_quest_list=0
 }
 local quest_board_menu_fields = {
-                    top={
-                        menu_list='<QuestCounterTopMenuList>k__BackingField',
-                        cursor='<TopMenuCursor>k__BackingField'
-                    },
-                    sub={
-                        menu_list='<QuestCounterSubMenuList>k__BackingField',
-                        cursor='<SubMenuCursor>k__BackingField'
-                    },
-                    level={
-                        menu_list='<QuestLevelMenuList>k__BackingField',
-                        cursor='<LevelMenuCursor>k__BackingField'
-                    }
+    top={
+        menu_list='<QuestCounterTopMenuList>k__BackingField',
+        cursor='<TopMenuCursor>k__BackingField'
+    },
+    sub={
+        menu_list='<QuestCounterSubMenuList>k__BackingField',
+        cursor='<SubMenuCursor>k__BackingField'
+    },
+    level={
+        menu_list='<QuestLevelMenuList>k__BackingField',
+        cursor='<LevelMenuCursor>k__BackingField'
+    }
 }
 local quest_board_menu_id = {
-                        [2]={ --investigations
-                            top=13,
-                            sub=5,
-                            order={
-                                'top',
-                                'sub'
-                            },
-                            id={
-                                top=32,
-                                sub=16
-                            }
-                        },
-                        [3]={ --anomaly
-                            top=13,
-                            sub=6,
-                            level=8,
-                            order={
-                                'top',
-                                'sub',
-                                'level'
-                            },
-                            id={
-                                top=32,
-                                sub=1
-                            }
-                        },
-                        [4]={ --master
-                            top=12,
-                            level=8,
-                            order={
-                                'top',
-                                'level'},
-                            id={top=1}
-                        },
-                        [5]={ --high
-                            top=20,
-                            sub=0,
-                            level=8,
-                            order={
-                                'top',
-                                'sub',
-                                'level'
-                            },
-                            id={
-                                top=32,
-                                sub=1
-                            }
-                        },
-                        [6]={ --low
-                            top=20,
-                            sub=1,
-                            level=8,
-                            order={
-                                'top',
-                                'sub',
-                                'level'
-                            },
-                            id={
-                                top=32,
-                                sub=1
-                            }
-                        },
-                        [7]={ --specific
-                            top=12,
-                            order={'top'},
-                            id={top=1}
-                        }
+    master={
+        [2]={ --investigations
+            top=13,
+            sub=5,
+            order={
+                'top',
+                'sub'
+            },
+            id={
+                top=32,
+                sub=16
+            }
+        },
+        [3]={ --anomaly
+            top=13,
+            sub=6,
+            level=8,
+            order={
+                'top',
+                'sub',
+                'level'
+            },
+            id={
+                top=32,
+                sub=1
+            }
+        },
+        [4]={ --master
+            top=12,
+            level=8,
+            order={
+                'top',
+                'level'},
+            id={top=1}
+        },
+        [5]={ --high
+            top=20,
+            sub=0,
+            level=8,
+            order={
+                'top',
+                'sub',
+                'level'
+            },
+            id={
+                top=32,
+                sub=1
+            }
+        },
+        [6]={ --low
+            top=20,
+            sub=1,
+            level=8,
+            order={
+                'top',
+                'sub',
+                'level'
+            },
+            id={
+                top=32,
+                sub=1
+            }
+        },
+        [7]={ --specific
+            top=12,
+            order={'top'},
+            id={top=1}
+            }
+    },
+    low_high={
+        [5]={ --high
+            top=1,
+            level=8,
+            order={
+                'top',
+                'level'
+            },
+            id={
+                top=1,
+            }
+        },
+        [6]={ --low
+            top=2,
+            level=8,
+            order={
+                'top',
+                'level'
+            },
+            id={
+                top=1,
+            },
+        },
+        [7]={ --specific
+            top=2,
+            order={'top'},
+            id={top=1}
+        }
+    }
 }
 
 
@@ -257,6 +289,11 @@ function quest_board.hook()
             if config.current.auto_quest.posting_method == 3 then
                 if vars.posting and not singletons.quest_board then
                     singletons.quest_board = methods.get_quest_board:call(singletons.guiman)
+                    if singletons.quest_board:get_field('_IsMasterRank') then
+                        quest_board_rank = 'master'
+                    else
+                        quest_board_rank = 'low_high'
+                    end
                     if config.current.auto_quest.join_multi_type ~= 1 then
                         methods.quest_board_decide_quick:call(singletons.quest_board,0,1)
                     else
@@ -349,10 +386,10 @@ function quest_board.hook()
                         end
 
                         local menu = {}
-                        menu.order = quest_board_menu_id[config.current.auto_quest.join_multi_type]['order']
+                        menu.order = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type]['order']
                         menu.type = menu.order[indexes.order]
-                        menu.index = quest_board_menu_id[config.current.auto_quest.join_multi_type][menu.type]
-                        menu.id = quest_board_menu_id[config.current.auto_quest.join_multi_type]['id'][menu.type]
+                        menu.index = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type][menu.type]
+                        menu.id = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type]['id'][menu.type]
                         menu.current = singletons.quest_counter:get_field('<QuestCounterState>k__BackingField')
 
                         if config.current.auto_quest.join_multi_type == 2
