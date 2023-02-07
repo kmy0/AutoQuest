@@ -12,6 +12,7 @@ methods.is_open_yn = guiman_type_def:get_method('isOpenYNInfo')
 methods.is_open_info = guiman_type_def:get_method('isOpenInfo()')
 methods.is_open_select = guiman_type_def:get_method('isOpenSelectInfo()')
 methods.is_open_startmenu = guiman_type_def:get_method('IsStartMenuAndSubmenuOpen()')
+methods.update_yn_window = guiman_type_def:get_method('updateYNInfoWindow')
 
 local gui_quest_board_type_def = sdk.find_type_definition('snow.gui.GuiQuestBoard')
 methods.quest_board_top_start = gui_quest_board_type_def:get_method('routineTopMenuStart')
@@ -60,6 +61,7 @@ methods.get_selected_quest = quest_counter_type_def:get_method('getQuestCounterS
 methods.get_active_menu_quest_list = quest_counter_type_def:get_method('getActiveQuestMenuList')
 methods.is_servant_quest = quest_counter_type_def:get_method('isCanJoinedServantQuest(System.Int32)')
 methods.save_random_mystery_search_info = quest_counter_type_def:get_method('saveRandomMysteryQuestBoardSerchInfo()')
+methods.get_mr_progress = quest_counter_type_def:get_method('getHallMRProgress')
 
 local quest_id_type_def = sdk.find_type_definition('snow.LobbyManager.QuestIdentifier')
 methods.quest_id_reset = quest_id_type_def:get_method('reset')
