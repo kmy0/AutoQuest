@@ -19,13 +19,13 @@ config_menu.is_opened = false
 config_menu.btn_text = 'Post'
 config_menu.post_methods = {'Speedrun','Quest Counter','Quest Board'}
 config_menu.join_multi_types = {
-                        'Hub Quest',
-                        'Random Anomaly Investigations',
-                        'Random Anomaly',
-                        'Random Master Rank',
-                        'Random High Rank',
-                        'Random Low Rank',
-                        'Specific Quest'
+    'Hub Quest',
+    'Random Anomaly Investigations',
+    'Random Anomaly',
+    'Random Master Rank',
+    'Random High Rank',
+    'Random Low Rank',
+    'Specific Quest'
 }
 
 
@@ -60,13 +60,13 @@ function config_menu.draw()
                                                                             "Anomaly Inv. Min Lv",
                                                                             config.current.auto_quest.anomaly_investigation_min_lv,
                                                                             1,
-                                                                            200
+                                                                            220
                                                                             )
         _,config.current.auto_quest.anomaly_investigation_max_lv = imgui.slider_int(
                                                                             "Anomaly Inv. Max Lv",
                                                                             config.current.auto_quest.anomaly_investigation_max_lv,
                                                                             1,
-                                                                            200
+                                                                            220
                                                                             )
         _,config.current.auto_quest.anomaly_investigation_monster = imgui.combo('Monster',config.current.auto_quest.anomaly_investigation_monster,dump.anomaly_investigations_main_monsters_array)
         _,config.current.auto_quest.anomaly_investigation_hunter_num = imgui.combo('Party Size',config.current.auto_quest.anomaly_investigation_hunter_num,dump.hunter_num_array)
@@ -185,6 +185,8 @@ function config_menu.draw()
                         if changed then random_changed = true end
                         changed,config.current.randomizer.exclude_anomaly_7 = imgui.checkbox('A7', config.current.randomizer.exclude_anomaly_7)
                         if changed then random_changed = true end
+                        changed,config.current.randomizer.exclude_anomaly_8 = imgui.checkbox('A8', config.current.randomizer.exclude_anomaly_8)
+                        if changed then random_changed = true end
                         imgui.tree_pop()
                     end
                 end
@@ -192,9 +194,9 @@ function config_menu.draw()
                 if changed then random_changed = true end
                 if not config.current.randomizer.exclude_anomaly_investigations then
                     if imgui.tree_node('Exclude Anomaly Investigations Level') then
-                        changed,config.current.randomizer.exclude_anomaly_i_below = imgui.slider_int('Exclude Below', config.current.randomizer.exclude_anomaly_i_below, 0, 200)
+                        changed,config.current.randomizer.exclude_anomaly_i_below = imgui.slider_int('Exclude Below', config.current.randomizer.exclude_anomaly_i_below, 0, 220)
                         if changed then random_changed = true end
-                        changed,config.current.randomizer.exclude_anomaly_i_above = imgui.slider_int('Exclude Above', config.current.randomizer.exclude_anomaly_i_above, 0, 200)
+                        changed,config.current.randomizer.exclude_anomaly_i_above = imgui.slider_int('Exclude Above', config.current.randomizer.exclude_anomaly_i_above, 0, 220)
                         if changed then random_changed = true end
                         imgui.tree_pop()
                     end
