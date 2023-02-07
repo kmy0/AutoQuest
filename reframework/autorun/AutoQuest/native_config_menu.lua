@@ -283,14 +283,14 @@ function native_config_menu.draw()
 																				"Anomaly Inv. Min Lv",
 																				config.current.auto_quest.anomaly_investigation_min_lv,
 																				1,
-																				200,
+																				220,
 																				"♥"
 																				)
 			_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
 																				"Anomaly Inv. Max Lv",
 																				config.current.auto_quest.anomaly_investigation_max_lv,
 																				1,
-																				200,
+																				220,
 																				"You can set this higher than game lets you normally. "
 																				)
 
@@ -684,6 +684,12 @@ function native_config_menu.draw()
 																		"Exclude/Include Anomaly Level 7 Quests."
 																		)
             if changed then random_changed = true end
+            changed,config.current.randomizer.exclude_anomaly_8 = mod_menu.CheckBox(
+																		'Exclude Anomaly Level 8',
+																		config.current.randomizer.exclude_anomaly_8,
+																		"Exclude/Include Anomaly Level 8 Quests."
+																		)
+            if changed then random_changed = true end
 
         end
 
@@ -729,7 +735,7 @@ function native_config_menu.draw()
 																			"Exclude Below Level",
 																			config.current.randomizer.exclude_anomaly_i_below,
 																			0,
-																			200,
+																			220,
 																			"♥" --
 																			)
 			if changed then random_changed = true end
@@ -737,7 +743,7 @@ function native_config_menu.draw()
 																			"Exclude Above Level",
 																			config.current.randomizer.exclude_anomaly_i_above,
 																			0,
-																			200,
+																			220,
 																			"♥" --
 																			)
 			if changed then random_changed = true end
