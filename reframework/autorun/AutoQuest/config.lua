@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.4.9'
+config.version = '1.5.0'
 
 config.default  = {
     auto_quest={
@@ -17,7 +17,7 @@ config.default  = {
         keep_rng=false,
         mystery_mode=false,
         anomaly_investigation_min_lv=1,
-        anomaly_investigation_max_lv=200,
+        anomaly_investigation_max_lv=220,
         anomaly_investigation_monster=1,
         anomaly_investigation_hunter_num=1,
         anomaly_investigation_cap_max_lvl=true,
@@ -42,6 +42,7 @@ config.default  = {
         exclude_anomaly_5=false,
         exclude_anomaly_6=false,
         exclude_anomaly_7=false,
+        exclude_anomaly_8=false,
         exclude_anomaly_investigations=false,
         exclude_anomaly_i_below=0,
         exclude_anomaly_i_above=0,
