@@ -10,7 +10,7 @@ local randomizer
 local menu_list_type_def = sdk.find_type_definition('snow.gui.SnowGuiCommonBehavior.MenuListCtrlBase')
 
 local hall_status = nil
-local quest_board_rank = 'master'
+local quest_board_rank = nil
 
 local auto_join = {
     trigger=false,
@@ -289,11 +289,6 @@ function quest_board.hook()
             if config.current.auto_quest.posting_method == 3 then
                 if vars.posting and not singletons.quest_board then
                     singletons.quest_board = methods.get_quest_board:call(singletons.guiman)
-                    if singletons.quest_board:get_field('_IsMasterRank') then
-                        quest_board_rank = 'master'
-                    else
-                        quest_board_rank = 'low_high'
-                    end
                     if config.current.auto_quest.join_multi_type ~= 1 then
                         methods.quest_board_decide_quick:call(singletons.quest_board,0,1)
                     else
@@ -345,6 +340,7 @@ function quest_board.hook()
                 vars.decide_trigger = false
                 vars.posting = false
                 vars.matching = false
+                quest_board_rank = nil
             end
         end
     )
@@ -359,6 +355,16 @@ function quest_board.hook()
         end
     )
 
+    sdk.hook(methods.update_yn_window,function(args)end,
+         function(retval)
+            if vars.posting then
+                return sdk.to_ptr(0)
+            else
+                return retval
+            end
+         end
+    )
+
     re.on_frame(function()
         if config.current.auto_quest.posting_method == 3 then
             if vars.posting then
@@ -370,6 +376,14 @@ function quest_board.hook()
                     end
 
                     if singletons.quest_counter then
+
+                        if not quest_board_rank then
+                            if methods.get_mr_progress:call(singletons.quest_counter) > 1 then
+                                quest_board_rank = 'master'
+                            else
+                                quest_board_rank = 'low_high'
+                            end
+                        end
 
                         if methods.is_open_info:call(singletons.guiman) then
                             vars.posting = false
