@@ -210,7 +210,7 @@ function dump.quest_data()
         no = quest:get_field("_QuestNo")
         if no ~= 0 and no ~= -1 then
             quest_data[no]['category'] = 'Event'
-            dump.non_custom_quest_ids[tostring(no)] = 1
+            dump.non_custom_quest_ids[tostring(no)] = true
         end
     end
 
