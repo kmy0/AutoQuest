@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.5.0'
+config.version = '1.5.1'
 
 config.default  = {
     auto_quest={
@@ -13,6 +13,7 @@ config.default  = {
         auto_randomize=false,
         send_join_request=false,
         auto_ready=false,
+        use_legacy=false,
         auto_depart=false,
         keep_rng=false,
         mystery_mode=false,
