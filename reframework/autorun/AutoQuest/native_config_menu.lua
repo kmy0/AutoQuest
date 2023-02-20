@@ -284,7 +284,7 @@ function native_config_menu.draw()
 																				config.current.auto_quest.anomaly_investigation_min_lv,
 																				1,
 																				220,
-																				"♥"
+																				""
 																				)
 			_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
 																				"Anomaly Inv. Max Lv",
@@ -379,6 +379,23 @@ function native_config_menu.draw()
 				config.current.auto_quest.auto_randomize and '☒' or '☐',
 				"Quest Counter, Speedrun Modes and Quest Board Specific Quest only."
 				)
+
+    end
+
+    if config.current.auto_quest.posting_method == 1 then
+
+		_,config.current.auto_quest.use_legacy = mod_menu.CheckBox(
+															'Use Legacy',
+															config.current.auto_quest.use_legacy,
+															'Old way of posting quests, enable this if quest posted by Speedrun Mode crashes your game.'
+															)
+    else
+
+    	mod_menu.Label(
+	    		"<COL GRAY>Use Legacy</COL>",
+	    		config.current.auto_quest.use_legacy and '☒' or '☐',
+	    		"Speedrun Mode only."
+	    		)
 
     end
 
