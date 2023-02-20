@@ -81,6 +81,10 @@ function config_menu.draw()
         _,config.current.auto_quest.auto_randomize = imgui.checkbox('Auto Randomize Quest', config.current.auto_quest.auto_randomize)
     end
 
+    if config.current.auto_quest.posting_method == 1 then
+         _,config.current.auto_quest.use_legacy = imgui.checkbox('Use Legacy', config.current.auto_quest.use_legacy)
+    end
+
     if config.current.auto_quest.posting_method ~= 3 then
          _,config.current.auto_quest.keep_rng = imgui.checkbox('Keep RNG', config.current.auto_quest.keep_rng)
     end
@@ -329,6 +333,12 @@ function config_menu.draw()
                     )
                 imgui.tree_pop()
             end
+            imgui.tree_pop()
+        end
+        if imgui.tree_node('Use Legacy') then
+            imgui.text(
+                'Old way of posting quests, enable this if quest posted by Speedrun Mode crashes your game.'
+                )
             imgui.tree_pop()
         end
         if imgui.tree_node('Keep RNG') then
