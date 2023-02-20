@@ -355,16 +355,6 @@ function quest_board.hook()
         end
     )
 
-    sdk.hook(methods.update_yn_window,function(args)end,
-         function(retval)
-            if vars.posting then
-                return sdk.to_ptr(0)
-            else
-                return retval
-            end
-         end
-    )
-
     re.on_frame(function()
         if config.current.auto_quest.posting_method == 3 then
             if vars.posting then
