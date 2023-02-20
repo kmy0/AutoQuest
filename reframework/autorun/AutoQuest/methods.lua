@@ -31,7 +31,6 @@ methods.quest_check = quest_board_quest_list_type_def:get_method('isSelectQuestO
 local lobbyman_type_def = sdk.find_type_definition('snow.LobbyManager')
 methods.recieve_chat_info = lobbyman_type_def:get_method('receiveChatInfomation')
 methods.is_online = lobbyman_type_def:get_method('isOnline')
-methods.create_room = lobbyman_type_def:get_method('createRoom')
 methods.request_ready = lobbyman_type_def:get_method('requestPrepareQuest')
 
 local questman_type_def = sdk.find_type_definition('snow.QuestManager')
