@@ -88,6 +88,17 @@ function common_hooks.hook()
 	    end
 	)
 
+    sdk.hook(methods.update_yn_window,function(args)end,
+     function(retval)
+        if vars.posting then
+            return sdk.to_ptr(0)
+        else
+            return retval
+        end
+     end
+	)
+
+
 	re.on_frame(function()
 		if singletons.spacewatcher then
 
@@ -144,10 +155,12 @@ function common_hooks.hook()
     end
     )
 
-   re.on_frame(function()
+   	re.on_frame(function()
 		if vars.post_quest_trigger then
-		    functions.post_quest()
-		    vars.post_quest_trigger = false
+			if sdk.get_managed_singleton('snow.VillageState'):get_Status() == 11 then
+			    functions.post_quest()
+			    vars.post_quest_trigger = false
+			end
 		end
 	end
 	)
