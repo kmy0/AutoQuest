@@ -10,7 +10,7 @@ local vars
 local random_changed = false
 local changed = false
 
-config_menu.window_flags = 0x10120
+config_menu.window_flags = 0
 config_menu.window_pos = Vector2f.new(400, 200)
 config_menu.window_pivot = Vector2f.new(0, 0)
 config_menu.window_size = Vector2f.new(560, 600)
@@ -18,6 +18,7 @@ config_menu.window_size = Vector2f.new(560, 600)
 config_menu.is_opened = false
 config_menu.btn_text = 'Post'
 config_menu.post_methods = {'Speedrun','Quest Counter','Quest Board'}
+config_menu.anomaly_target_types = {'Monster', 'Material'}
 config_menu.join_multi_types = {
     'Hub Quest',
     'Random Anomaly Investigations',
@@ -25,7 +26,8 @@ config_menu.join_multi_types = {
     'Random Master Rank',
     'Random High Rank',
     'Random Low Rank',
-    'Specific Quest'
+    'Specific Quest',
+    'Random Special Investigations',
 }
 
 
@@ -56,20 +58,35 @@ function config_menu.draw()
     end
 
     if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 2 then
-        _,config.current.auto_quest.anomaly_investigation_min_lv = imgui.slider_int(
-                                                                            "Anomaly Inv. Min Lv",
-                                                                            config.current.auto_quest.anomaly_investigation_min_lv,
-                                                                            1,
-                                                                            220
-                                                                            )
-        _,config.current.auto_quest.anomaly_investigation_max_lv = imgui.slider_int(
-                                                                            "Anomaly Inv. Max Lv",
-                                                                            config.current.auto_quest.anomaly_investigation_max_lv,
-                                                                            1,
-                                                                            220
-                                                                            )
+        _, config.current.auto_quest.anomaly_investigation_target_type = imgui.combo('Target Type', config.current.auto_quest.anomaly_investigation_target_type, config_menu.anomaly_target_types)
+
+        if config.current.auto_quest.anomaly_investigation_target_type == 1 then
+            _,config.current.auto_quest.anomaly_investigation_min_lv = imgui.slider_int(
+                                                                                "Anomaly Inv. Min Lv",
+                                                                                config.current.auto_quest.anomaly_investigation_min_lv,
+                                                                                1,
+                                                                                300
+                                                                                )
+            _,config.current.auto_quest.anomaly_investigation_max_lv = imgui.slider_int(
+                                                                                "Anomaly Inv. Max Lv",
+                                                                                config.current.auto_quest.anomaly_investigation_max_lv,
+                                                                                1,
+                                                                                300
+                                                                                )
+            _,config.current.auto_quest.anomaly_investigation_monster = imgui.combo('Monster',config.current.auto_quest.anomaly_investigation_monster,dump.anomaly_investigations_main_monsters_array)
+        else
+            _, config.current.auto_quest.anomaly_investigation_material = imgui.combo('Material', config.current.auto_quest.anomaly_investigation_material, dump.afflicted_materials.array)
+        end
+
+        _,config.current.auto_quest.anomaly_investigation_hunter_num = imgui.combo('Party Size',config.current.auto_quest.anomaly_investigation_hunter_num,dump.hunter_num_array)
+    end
+
+    if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 8 then
         _,config.current.auto_quest.anomaly_investigation_monster = imgui.combo('Monster',config.current.auto_quest.anomaly_investigation_monster,dump.anomaly_investigations_main_monsters_array)
         _,config.current.auto_quest.anomaly_investigation_hunter_num = imgui.combo('Party Size',config.current.auto_quest.anomaly_investigation_hunter_num,dump.hunter_num_array)
+    end
+
+    if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 2 and config.current.auto_quest.anomaly_investigation_target_type == 1 then
         changed,config.current.auto_quest.anomaly_investigation_cap_max_lvl = imgui.checkbox('Set Max Lv At Current Research Lv', config.current.auto_quest.anomaly_investigation_cap_max_lvl)
         if changed and config.current.auto_quest.anomaly_investigation_cap_max_lvl then functions.set_random_myst_lvl_to_max() end
     end
@@ -198,9 +215,9 @@ function config_menu.draw()
                 if changed then random_changed = true end
                 if not config.current.randomizer.exclude_anomaly_investigations then
                     if imgui.tree_node('Exclude Anomaly Investigations Level') then
-                        changed,config.current.randomizer.exclude_anomaly_i_below = imgui.slider_int('Exclude Below', config.current.randomizer.exclude_anomaly_i_below, 0, 220)
+                        changed,config.current.randomizer.exclude_anomaly_i_below = imgui.slider_int('Exclude Below', config.current.randomizer.exclude_anomaly_i_below, 0, 300)
                         if changed then random_changed = true end
-                        changed,config.current.randomizer.exclude_anomaly_i_above = imgui.slider_int('Exclude Above', config.current.randomizer.exclude_anomaly_i_above, 0, 220)
+                        changed,config.current.randomizer.exclude_anomaly_i_above = imgui.slider_int('Exclude Above', config.current.randomizer.exclude_anomaly_i_above, 0, 300)
                         if changed then random_changed = true end
                         imgui.tree_pop()
                     end

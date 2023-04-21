@@ -2,7 +2,7 @@ local functions = {}
 local methods
 local config
 local vars
-local native_config_menu
+-- local native_config_menu
 local singletons
 
 local quest_board_cmd_id = sdk.find_type_definition('snow.gui.GuiManager.OtherCmdId'):get_field('QuestBoard'):get_data(nil)
@@ -26,11 +26,11 @@ function functions.table_length(table)
 end
 
 function functions.error_handler(error_message)
-    if native_config_menu.active then
-        native_config_menu.mod_menu.PromptMsg(error_message)
-    else
+    -- if native_config_menu.active then
+        -- native_config_menu.mod_menu.PromptMsg(error_message)
+    -- else
         functions.post_info_message("<COL RED>" .. error_message .. "<COL>")
-    end
+    -- end
 end
 
 function functions.toggle_options(state)
@@ -119,7 +119,7 @@ function functions.init()
 	methods = require("AutoQuest.methods")
 	config = require("AutoQuest.config")
 	vars = require("AutoQuest.Common.vars")
-    native_config_menu = require("AutoQuest.native_config_menu")
+    -- native_config_menu = require("AutoQuest.native_config_menu")
 end
 
 return functions

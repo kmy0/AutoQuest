@@ -110,7 +110,19 @@ local quest_board_menu_id = {
             top=12,
             order={'top'},
             id={top=1}
+        },
+        [8]={ --special
+            top=13,
+            sub=7,
+            order={
+                'top',
+                'sub'
+            },
+            id={
+                top=32,
+                sub=16
             }
+        }
     },
     low_high={
         [5]={ --high
@@ -191,6 +203,26 @@ local function get_quest_max_join(quest_data)
     end
 end
 
+local function set_random_mystery_fields_special()
+    local settings = {
+        hunter_num=tonumber(dump.hunter_num_array[config.current.auto_quest.anomaly_investigation_hunter_num]),
+        monster=dump.anomaly_investigations_main_monsters[
+                    dump.anomaly_investigations_main_monsters_array[
+                        config.current.auto_quest.anomaly_investigation_monster
+                        ]
+                    ]
+    }
+
+    if not settings.monster then
+        settings.monster = 0
+    end
+
+    local gui_save_data = singletons.guiman._GuiSaveDataMgr._SaveDataWork
+    gui_save_data._QuestBoardSpecialRandomMysterySearchOrderNum = settings.hunter_num
+    gui_save_data._QuestBoardSpecialRandomMysterySearchTarget = settings.monster
+    gui_save_data._QuestBoardSpecialRandomMysterySearchSave = true
+end
+
 local function set_random_mystery_fields()
     local settings = {
         max_lvl=config.current.auto_quest.anomaly_investigation_max_lv,
@@ -203,39 +235,56 @@ local function set_random_mystery_fields()
                     ]
     }
 
-    if config.current.auto_quest.anomaly_investigation_monster == 2 then
-        local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
-        local research_request = methods.get_research_target:call(mysterylabo)
+    if config.current.auto_quest.anomaly_investigation_target_type == 1 then
+        if config.current.auto_quest.anomaly_investigation_monster == 2 then
+            local mysterylabo = methods.get_mystery_labo:call(singletons.facilitydataman)
+            local research_request = methods.get_research_target:call(mysterylabo)
 
-        if research_request then
-            settings.monster = research_request:get_field('_MainTargetEnemyType')
-            local monster_min_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
-            if settings.min_lvl < monster_min_lvl then
-                settings.min_lvl = monster_min_lvl
-            end
-            if settings.max_lvl < settings.min_lvl then
-                settings.max_lvl = methods.get_mystery_research_level:call(singletons.progman)
+            if research_request then
+                settings.monster = research_request:get_field('_MainTargetEnemyType')
+                local monster_min_lvl = methods.get_limit_lvl:call(mysterylabo,research_request:get_field('_QuestCondition'))
+                if settings.min_lvl < monster_min_lvl then
+                    settings.min_lvl = monster_min_lvl
+                end
                 if settings.max_lvl < settings.min_lvl then
-                    settings.max_lvl = settings.min_lvl
+                    settings.max_lvl = methods.get_mystery_research_level:call(singletons.progman)
+                    if settings.max_lvl < settings.min_lvl then
+                        settings.max_lvl = settings.min_lvl
+                    end
                 end
             end
-        end
-    else
-        if settings.monster then
-            local monster_min_lvl = methods.get_monster_min_lvl_appearance:call(singletons.questman,settings.monster)
-            if settings.min_lvl < monster_min_lvl then
-                settings.min_lvl = monster_min_lvl
+        else
+            if settings.monster then
+                local monster_min_lvl = methods.get_monster_min_lvl_appearance:call(singletons.questman,settings.monster)
+                if settings.min_lvl < monster_min_lvl then
+                    settings.min_lvl = monster_min_lvl
+                end
+            end
+            if settings.max_lvl < settings.min_lvl then
+                settings.max_lvl = settings.min_lvl
             end
         end
-        if settings.max_lvl < settings.min_lvl then
-            settings.max_lvl = settings.min_lvl
+
+        if not settings.monster then
+            settings.monster = 0
         end
+
+        singletons.quest_counter:set_field('<_BoardLevelMin>k__BackingField',settings.min_lvl)
+        singletons.quest_counter:set_field('<_BoardLevelMax>k__BackingField',settings.max_lvl)
+        singletons.quest_counter:set_field('<_BoardRandomMysteryItemId>k__BackingField', 67108864)
+        singletons.quest_counter:set_field('<_BoardEnemyType>k__BackingField',settings.monster)
+    else
+        local item_name = dump.afflicted_materials.array[config.current.auto_quest.anomaly_investigation_material]
+        local item = dump.afflicted_materials.table[item_name]
+
+        singletons.quest_counter:set_field('<_BoardLevelMin>k__BackingField', item.min)
+        singletons.quest_counter:set_field('<_BoardLevelMax>k__BackingField', item.max)
+        singletons.quest_counter:set_field('<_BoardRandomMysteryItemId>k__BackingField', item.id)
+        singletons.quest_counter:set_field('<_BoardEnemyType>k__BackingField', 0)
     end
 
-    singletons.quest_counter:set_field('<_BoardLevelMin>k__BackingField',settings.min_lvl)
-    singletons.quest_counter:set_field('<_BoardLevelMax>k__BackingField',settings.max_lvl)
+
     singletons.quest_counter:set_field('<_BoardOrderNum>k__BackingField',settings.hunter_num)
-    singletons.quest_counter:set_field('<_BoardEnemyType>k__BackingField',settings.monster)
     singletons.quest_counter:set_field('<_BoardSearchSave>k__BackingField',true)
     methods.save_random_mystery_search_info:call(singletons.quest_counter)
 end
@@ -396,23 +445,34 @@ function quest_board.hook()
                         menu.id = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type]['id'][menu.type]
                         menu.current = singletons.quest_counter:get_field('<QuestCounterState>k__BackingField')
 
-                        if config.current.auto_quest.join_multi_type == 2
-                        and actions.set_random_mystery_fields then
+                        if (
+                            config.current.auto_quest.join_multi_type == 2
+                            and actions.set_random_mystery_fields
+                        ) then
                             set_random_mystery_fields()
+                            actions.set_random_mystery_fields = false
+                        elseif (
+                                config.current.auto_quest.join_multi_type == 8
+                                and actions.set_random_mystery_fields
+                        ) then
+                            set_random_mystery_fields_special()
                             actions.set_random_mystery_fields = false
                         end
 
                         if (
-                        config.current.auto_quest.join_multi_type ~= 2
-                        or
-                        config.current.auto_quest.join_multi_type == 2
-                        and not actions.start_random_mystery_matchmaking
-                        )
-                        and indexes.order > #menu.order then
+                            indexes.order > #menu.order
+                            and (
+                                 config.current.auto_quest.join_multi_type ~= 2
+                                 and config.current.auto_quest.join_multi_type ~= 8
+                                 or not actions.start_random_mystery_matchmaking
+                            )
+                        ) then
                             vars.decide_trigger = true
-                        elseif indexes.order > #menu.order
-                        and config.current.auto_quest.join_multi_type == 2
-                        and actions.start_random_mystery_matchmaking then
+                        elseif (
+                                indexes.order > #menu.order
+                                and (config.current.auto_quest.join_multi_type == 2 or config.current.auto_quest.join_multi_type == 8)
+                                and actions.start_random_mystery_matchmaking
+                        ) then
                             methods.tree_set_node_by_id:call(
                                 singletons.quest_counter:get_field('<refQuestCounterBehaviorTree>k__BackingField'),
                                 1107141891,

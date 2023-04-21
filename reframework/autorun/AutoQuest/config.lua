@@ -21,6 +21,8 @@ config.default  = {
         anomaly_investigation_max_lv=220,
         anomaly_investigation_monster=1,
         anomaly_investigation_hunter_num=1,
+        anomaly_investigation_target_type=1,
+        anomaly_investigation_material=1,
         anomaly_investigation_cap_max_lvl=true,
         quest_no=''
     },

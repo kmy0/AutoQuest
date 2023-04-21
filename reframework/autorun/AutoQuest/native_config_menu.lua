@@ -44,7 +44,8 @@ local join_multi_type_descs = {
 						'Queue for Random Master Rank Quest.',
 						'Queue for Random High Rank Quest.',
 						'Queue for Random Low Rank Quest.',
-						'Queue for Specific Quest.'
+						'Queue for Specific Quest.',
+						'Queue for Random Special Investigation.',
 }
 
 
@@ -283,14 +284,14 @@ function native_config_menu.draw()
 																				"Anomaly Inv. Min Lv",
 																				config.current.auto_quest.anomaly_investigation_min_lv,
 																				1,
-																				220,
+																				300,
 																				""
 																				)
 			_,config.current.auto_quest.anomaly_investigation_max_lv = mod_menu.Slider(
 																				"Anomaly Inv. Max Lv",
 																				config.current.auto_quest.anomaly_investigation_max_lv,
 																				1,
-																				220,
+																				300,
 																				"You can set this higher than game lets you normally. "
 																				)
 

@@ -89,15 +89,14 @@ function common_hooks.hook()
 	)
 
     sdk.hook(methods.update_yn_window,function(args)end,
-     function(retval)
-        if vars.posting then
-            return sdk.to_ptr(0)
-        else
-            return retval
-        end
-     end
+		function(retval)
+			if vars.posting then
+			    return sdk.to_ptr(0)
+			else
+			    return retval
+			end
+		end
 	)
-
 
 	re.on_frame(function()
 		if singletons.spacewatcher then
@@ -146,6 +145,7 @@ function common_hooks.hook()
                 vars.selected = nil
                 vars.selection_trigger = nil
             end
+
             if methods.menu_list_cursor_get_index:call(vars.cursor) == vars.selection_trigger then
                 vars.selection_timer = 0
                 vars.selection_trigger = nil
@@ -156,6 +156,11 @@ function common_hooks.hook()
     )
 
    	re.on_frame(function()
+   	    if aie_autoquest_reload and dump.ed then
+			dump.random_mystery()
+			randomizer.filter_quests()
+			aie_autoquest_reload = false
+   	    end
 		if vars.post_quest_trigger then
 			if sdk.get_managed_singleton('snow.VillageState'):get_Status() == 11 then
 			    functions.post_quest()

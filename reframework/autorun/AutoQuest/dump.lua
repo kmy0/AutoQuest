@@ -11,6 +11,11 @@ dump.no_of_quests = 0
 dump.non_custom_quest_ids_file_name = 'AutoQuest/noncustom_ids.json'
 dump.anomaly_investigations_main_monsters_file_name = 'AutoQuest/monsters.json'
 dump.anomaly_investigations_main_monsters_array = {}
+dump.afflicted_materials = {
+    table={},
+    array={},
+    file_name='AutoQuest/afflicted_materials.json'
+}
 dump.hunter_num_array = {'2','4'}
 
 dump.quest_types = {
@@ -243,6 +248,20 @@ function dump.load()
         table.insert(dump.anomaly_investigations_main_monsters_array,2,'Research Target')
     end
 
+    dump.afflicted_materials.table = json.load_file(dump.afflicted_materials.file_name)
+    if dump.afflicted_materials.table then
+        for k, _ in pairs(dump.afflicted_materials.table) do
+            table.insert(dump.afflicted_materials.array, k)
+        end
+
+        table.sort(dump.afflicted_materials.array)
+        dump.afflicted_materials.table.Any = {
+            id=67108864,
+            max=300,
+            min=1
+        }
+        table.insert(dump.afflicted_materials.array, 1, 'Any')
+    end
 end
 
 function dump.init()
