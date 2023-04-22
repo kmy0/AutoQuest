@@ -276,6 +276,7 @@ function quest_counter.hook()
                         vars.posting = false
                         vars.close_trigger = true
                         functions.error_handler("Menu selection timeout.")
+                        return
                     end
 
                     local current_menu = singletons.quest_counter:get_field('<QuestCounterState>k__BackingField')
@@ -285,6 +286,7 @@ function quest_counter.hook()
                             vars.close_trigger = true
                             vars.posting = false
                             functions.error_handler("Can't post chosen quest type.")
+                            return
                         end
 
                         actions.select_menu = false

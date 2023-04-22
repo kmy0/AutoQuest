@@ -436,10 +436,20 @@ function quest_board.hook()
                             vars.posting = false
                             vars.close_trigger = true
                             functions.error_handler("Menu selection timeout.")
+                            return
                         end
 
                         local menu = {}
-                        menu.order = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type]['order']
+                        menu.name = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type]
+
+                        if not menu.name then
+                            vars.posting = false
+                            vars.close_trigger = true
+                            functions.error_handler("Can't join chosen quest type.")
+                            return
+                        end
+
+                        menu.order = menu.name['order']
                         menu.type = menu.order[indexes.order]
                         menu.index = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type][menu.type]
                         menu.id = quest_board_menu_id[quest_board_rank][config.current.auto_quest.join_multi_type]['id'][menu.type]
@@ -486,6 +496,7 @@ function quest_board.hook()
                                     vars.posting = false
                                     vars.close_trigger = true
                                     functions.error_handler("Can't join chosen quest type.")
+                                    return
                                 end
                                 actions.select_menu = false
                             end
@@ -560,10 +571,10 @@ function quest_board.hook()
                             vars.posting = false
                             vars.close_trigger = true
                             functions.error_handler(quest.error)
+                            return
                         end
                     end
                 end
-
             end
         end
     end
