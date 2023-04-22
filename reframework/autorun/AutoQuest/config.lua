@@ -3,7 +3,7 @@ local config = {}
 local functions
 
 config.config_file_name = 'AutoQuest/config.json'
-config.version = '1.5.1'
+config.version = '1.6.0'
 
 config.default  = {
     auto_quest={
@@ -46,6 +46,8 @@ config.default  = {
         exclude_anomaly_6=false,
         exclude_anomaly_7=false,
         exclude_anomaly_8=false,
+        exclude_anomaly_9=false,
+        exclude_special_investigations=false,
         exclude_anomaly_investigations=false,
         exclude_anomaly_i_below=0,
         exclude_anomaly_i_above=0,
@@ -86,10 +88,6 @@ config.default  = {
         button=nil,
         button_name='None',
         button_type=nil
-    },
-    gui={
-        hide_gui=false,
-        mute_ui_sounds=false,
     }
 }
 

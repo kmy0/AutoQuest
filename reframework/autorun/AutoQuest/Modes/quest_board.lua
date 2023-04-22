@@ -313,11 +313,11 @@ function quest_board.switch()
                 return
             elseif config.current.auto_quest.posting_method == 3
             and config.current.auto_quest.join_multi_type == 7
-            and not dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)] then
+            and not dump.quest_data_list[config.current.auto_quest.quest_no] then
                 functions.error_handler("Invalid Quest ID.")
             elseif config.current.auto_quest.posting_method == 3
             and config.current.auto_quest.join_multi_type == 7
-            and not dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)]['online'] then
+            and not dump.quest_data_list[config.current.auto_quest.quest_no]['online'] then
                 functions.error_handler("Cant be played online.")
             else
                 for k,_ in pairs(actions) do actions[k] = true end
@@ -367,7 +367,7 @@ function quest_board.hook()
             if vars.posting
             and config.current.auto_quest.posting_method == 3
             and config.current.auto_quest.join_multi_type == 7 then
-                args[3] = sdk.to_ptr(tonumber(config.current.auto_quest.quest_no))
+                args[3] = sdk.to_ptr(functions.sanitize_quest_no(config.current.auto_quest.quest_no))
             end
         end
     )

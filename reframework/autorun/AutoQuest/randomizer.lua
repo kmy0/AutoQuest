@@ -13,14 +13,18 @@ function randomizer.filter_quests()
     for no,data in pairs(dump.quest_data_list) do
         if not data then goto continue end
         if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 7 then
-            if not data['online'] or not dump.non_custom_quest_ids[tostring(no)] then goto continue end
+            if not data['online'] or not dump.non_custom_quest_ids[no] then goto continue end
         elseif config.current.auto_quest.posting_method == 2 and config.current.auto_quest.send_join_request then
-            if not data['online'] and data['category'] ~= 'Random Mystery' or not dump.non_custom_quest_ids[tostring(no)] then goto continue end
+            if not data['online'] and (data['category'] ~= 'Random Mystery' and data['category'] ~= 'Special Random Mystery') or not dump.non_custom_quest_ids[no] then goto continue end
         end
         if data['type'] == dump.quest_types['INVALID'] then goto continue end
-        if config.current.randomizer.exclude_posted_quests and config.current.randomizer.posted_quests[tostring(no)] then goto continue end
-        if config.current.randomizer.exclude_custom and not dump.non_custom_quest_ids[tostring(no)] then goto continue end
-        if config.current.randomizer.exclude_non_custom and dump.non_custom_quest_ids[tostring(no)] then goto continue end
+        if config.current.randomizer.exclude_posted_quests and config.current.randomizer.posted_quests[no] then goto continue end
+        if config.current.randomizer.exclude_custom and not dump.non_custom_quest_ids[no] then goto continue end
+        if config.current.randomizer.exclude_non_custom and dump.non_custom_quest_ids[no] then goto continue end
+
+        if data['category'] == 'Special Random Mystery' then
+            if config.current.randomizer.exclude_special_investigations then goto continue end
+        end
         if data['category'] == 'Random Mystery' then
             if config.current.randomizer.exclude_invalid_anomaly_investigations and not data.valid then goto continue end
             if config.current.randomizer.exclude_anomaly_investigations then goto continue end
@@ -58,6 +62,7 @@ function randomizer.filter_quests()
                 if config.current.randomizer.exclude_anomaly_6 and data['level'] == 5 then goto continue end
                 if config.current.randomizer.exclude_anomaly_7 and data['level'] == 6 then goto continue end
                 if config.current.randomizer.exclude_anomaly_8 and data['level'] == 7 then goto continue end
+                if config.current.randomizer.exclude_anomaly_9 and data['level'] == 8 then goto continue end
             end
         end
         if data['category'] == 'Arena' then

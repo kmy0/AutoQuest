@@ -74,6 +74,11 @@ local function parse_quest_data(quest_data)
 
         quest.type = quest.data:get_field("_QuestType")
 
+        if no == 385901 then    --A9 Risen Valstrax
+            quest.category = 'Mystery'
+            quest.level = 8
+        end
+
         if quest.type == dump.quest_types['HYAKURYU'] then
             quest.category = 'Rampage'
         end
@@ -83,6 +88,7 @@ local function parse_quest_data(quest_data)
         end
 
         if quest.category ~= 'Random Mystery'
+        and quest.category ~= 'Special Random Mystery'
         and quest.category ~= 'Kingdom'
         and quest.category ~= 'ServantRequest'
         and quest.type ~= dump.quest_types['TRAINING']
@@ -96,7 +102,7 @@ local function parse_quest_data(quest_data)
 
         if quest.category == 'Rampage' then
             quest.monster_hunt_type = 'multi'
-        elseif quest.category == 'Random Mystery' then
+        elseif quest.category == 'Random Mystery' or quest.category == 'Special Random Mystery' then
             if quest.data:get_field('_HuntTargetNum') > 1 then
                 quest.monster_hunt_type = 'multi'
             else
@@ -135,23 +141,23 @@ local function parse_quest_data(quest_data)
             end
         end
 
-        if quest.category == 'Random Mystery' then
+        if quest.category == 'Random Mystery' or quest.category == 'Special Random Mystery' then
             if methods.random_mystery_quest_auth:call(singletons.questman,quest.data,false) ~= 0 then
                 quest.is_valid = false
             end
         end
 
-        quest.is_completed = methods.is_quest_clear:call(singletons.progquestman,no)
+        quest.is_completed = methods.is_quest_clear:call(singletons.progquestman, functions.sanitize_quest_no(no))
 
         if quest.category == 'Event' and quest.data:get_field("_EnemyLv") == dump.ranks_ids['High'] and not highrank_unlock then
             quest.is_unlocked = false
         elseif quest.category == 'Event' then
             quest.is_unlocked = true
         else
-            quest.is_unlocked = methods.is_quest_unlocked:call(singletons.progquestman,no)
+            quest.is_unlocked = methods.is_quest_unlocked:call(singletons.progquestman, functions.sanitize_quest_no(no))
         end
 
-        dump.quest_data_list[no] = {
+        dump.quest_data_list[tostring(no)] = {
                         type=quest.type,
                         rank=quest.rank,
                         level=quest.level,
@@ -175,9 +181,13 @@ function dump.random_mystery()
         if no ~= 0 and no ~= -1 then
             quest_data[no] = {data=quest,category='Random Mystery'}
         end
+        if quest._isSpecialQuestOpen then
+            quest_data[no .. 'S'] = {data=quest,category='Special Random Mystery'}
+        end
     end
     for i=0,120 do
-        dump.quest_data_list[700000 + i] = nil
+        dump.quest_data_list[tostring(700000 + i)] = nil
+        dump.quest_data_list[(700000 + i) .. 'S'] = nil
     end
     parse_quest_data(quest_data)
     dump.no_of_quests = functions.table_length(dump.quest_data_list)
@@ -223,6 +233,9 @@ function dump.quest_data()
         no = quest:get_field("_QuestNo")
         if no ~= 0 and no ~= -1 then
             quest_data[no] = {data=quest,category='Random Mystery'}
+            if quest._isSpecialQuestOpen then
+                quest_data[no .. 'S'] = {data=quest,category='Special Random Mystery'}
+            end
         end
     end
 

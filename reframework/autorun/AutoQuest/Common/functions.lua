@@ -7,6 +7,19 @@ local singletons
 
 local quest_board_cmd_id = sdk.find_type_definition('snow.gui.GuiManager.OtherCmdId'):get_field('QuestBoard'):get_data(nil)
 
+
+function functions.endswith(str, suffix)
+    return str:sub(-#suffix) == suffix
+end
+
+function functions.sanitize_quest_no(quest_no)
+    quest_no = tostring(quest_no)
+    if functions.endswith(quest_no, "S") then
+        quest_no = quest_no:sub(1, -2)
+    end
+    return tonumber(quest_no)
+end
+
 function functions.post_info_message(message)
 	methods.post_info_message:call(singletons.chatman,'<COL YEL>AutoQuest</COL>\n' .. message,true and 2412657311)
 end
@@ -49,9 +62,9 @@ function functions.toggle_options(state)
         end
     end
 
-    if native_config_menu.active then
-        native_config_menu.mod_menu.Repaint()
-    end
+    -- if native_config_menu.active then
+    --     native_config_menu.mod_menu.Repaint()
+    -- end
 end
 
 function functions.deep_copy(original, copies)

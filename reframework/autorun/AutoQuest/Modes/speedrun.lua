@@ -23,7 +23,7 @@ function speedrun.switch()
                     and #randomizer.filtered_quest_list ~= 0
                     or not config.current.auto_quest.auto_randomize
                 ) then
-                    if dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)] then
+                    if dump.quest_data_list[config.current.auto_quest.quest_no] then
 
                         vars.posting = true
 
@@ -92,6 +92,7 @@ function speedrun.legacy_hook()
                         sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager')
                     )
                 end
+
                 methods.send_quest_to_questman:call(nil)
             end
         end

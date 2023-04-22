@@ -447,26 +447,26 @@ function bind.register()
 	return false
 end
 
-function bind.listen()
-	if bind.hard_kb then
-		for key, key_name in pairs(bind.listen_valid_keys) do
-			if methods.check_kb_btn:call(bind.hard_kb, key) then
-				local text = tostring(config.current.auto_quest.quest_no)
-				if key == 8 then
-					if #text > 0 then
-						text = text:sub(1, -2)
-					end
-				elseif key == 13 or key == 146 then
-					bind.listen_trigger = false
-				else
-					text = text .. key_name
-				end
+-- function bind.listen()
+-- 	if bind.hard_kb then
+-- 		for key, key_name in pairs(bind.listen_valid_keys) do
+-- 			if methods.check_kb_btn:call(bind.hard_kb, key) then
+-- 				local text = tostring(config.current.auto_quest.quest_no)
+-- 				if key == 8 then
+-- 					if #text > 0 then
+-- 						text = text:sub(1, -2)
+-- 					end
+-- 				elseif key == 13 or key == 146 then
+-- 					bind.listen_trigger = false
+-- 				else
+-- 					text = text .. key_name
+-- 				end
 
-				config.current.auto_quest.quest_no = text
-			end
-		end
-	end
-end
+-- 				config.current.auto_quest.quest_no = text
+-- 			end
+-- 		end
+-- 	end
+-- end
 
 function bind.update()
 	if singletons.hwkb then bind.hard_kb = singletons.hwkb:get_field("hardKeyboard") end

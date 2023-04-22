@@ -18,6 +18,7 @@ local quest_counter_obj_loop = {
 local actions = {
     select_quest_counter=false,
     select_menu=false,
+    select_sub_menu=false,
     select_option=false,
     select_mystery=false
 }
@@ -35,7 +36,12 @@ local quest_counter_top_menu_types = {
     [2]="Normal", --Normal_Hall_Low
     [12]="Normal", --Normal_Hall_Master
     [4]="Normal", --Training
-    [13]='Random Mystery' --Mystery
+    [13]='Random Mystery', --Mystery
+}
+
+local quest_counter_sub_menu_types = {
+    [5]='Random Mystery',
+    [7]='Special Random Mystery',
 }
 
 local function select_mystery_quest()
@@ -46,7 +52,7 @@ local function select_mystery_quest()
 
     for i=0,menu.size-1 do
         local quest = menu.list:get_Item(i)
-        if quest:get_field('<RandomMystery>k__BackingField'):get_field('_QuestNo') == tonumber(config.current.auto_quest.quest_no) then
+        if quest:get_field('<RandomMystery>k__BackingField'):get_field('_QuestNo') == functions.sanitize_quest_no(config.current.auto_quest.quest_no) then
             methods.menu_list_cursor_set_index:call(vars.cursor,i)
             vars.selection_trigger = i
             return true
@@ -63,10 +69,39 @@ local function get_quest_counter_top_menu()
     menu.cursor_index = methods.menu_list_cursor_get_index:call(vars.cursor)
     menu.id = menu.list:get_Item(menu.cursor_index)
 
+    local quest_type = vars.quest_type
+    if quest_type == 'Special Random Mystery' then
+        quest_type = 'Random Mystery'
+    end
+
+    if quest_counter_top_menu_types[menu.id] ~= quest_type then
+        for i=0,menu.size-1 do
+            menu.id = menu.list:get_Item(i)
+            if quest_counter_top_menu_types[menu.id] == quest_type then
+                methods.menu_list_cursor_set_index:call(vars.cursor,i)
+                vars.selection_trigger = i
+                return true
+            end
+        end
+    else
+        vars.selected = true
+        return true
+    end
+    return false
+end
+
+local function get_quest_counter_sub_menu()
+    local menu = {}
+    menu.list = singletons.quest_counter:get_field('<QuestCounterSubMenuList>k__BackingField')
+    vars.cursor = singletons.quest_counter:get_field('<SubMenuCursor>k__BackingField')
+    menu.size = menu.list:get_field('mSize')
+    menu.cursor_index = methods.menu_list_cursor_get_index:call(vars.cursor)
+    menu.id = menu.list:get_Item(menu.cursor_index)
+
     if quest_counter_top_menu_types[menu.id] ~= vars.quest_type then
         for i=0,menu.size-1 do
             menu.id = menu.list:get_Item(i)
-            if quest_counter_top_menu_types[menu.id] == vars.quest_type then
+            if quest_counter_sub_menu_types[menu.id] == vars.quest_type then
                 methods.menu_list_cursor_set_index:call(vars.cursor,i)
                 vars.selection_trigger = i
                 return true
@@ -96,10 +131,14 @@ function quest_counter.switch()
                     if config.current.auto_quest.auto_randomize
                     and #randomizer.filtered_quest_list ~= 0
                     or not config.current.auto_quest.auto_randomize then
-                        if dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)] then
-                            for k,v in pairs(actions) do actions[k] = true end
-                            vars.quest_type = dump.quest_data_list[tonumber(config.current.auto_quest.quest_no)]['category']
-                            if vars.quest_type ~= 'Random Mystery' then vars.quest_type = "Normal" end
+                        if dump.quest_data_list[config.current.auto_quest.quest_no] then
+
+                            for k,v in pairs(actions) do
+                                actions[k] = true
+                            end
+
+                            vars.quest_type = dump.quest_data_list[config.current.auto_quest.quest_no]['category']
+                            if vars.quest_type ~= 'Random Mystery' and vars.quest_type ~= 'Special Random Mystery' then vars.quest_type = "Normal" end
                             vars.posting = true
                         else
                             functions.error_handler("Invalid Quest ID.")
@@ -241,33 +280,53 @@ function quest_counter.hook()
 
                     local current_menu = singletons.quest_counter:get_field('<QuestCounterState>k__BackingField')
 
-                    if current_menu == 0
-                    and actions.select_menu then
+                    if current_menu == 0 and actions.select_menu then
                         if not get_quest_counter_top_menu() then
                             vars.close_trigger = true
+                            vars.posting = false
                             functions.error_handler("Can't post chosen quest type.")
                         end
+
                         actions.select_menu = false
                     end
 
-                    if current_menu ~= 0
-                    and current_menu ~= 30
-                    or
-                    current_menu == 30
-                    and methods.is_open_select:call(singletons.guiman) then
+                    if (
+                        current_menu == 32
+                        and actions.select_sub_menu
+                        and (
+                             vars.quest_type == 'Special Random Mystery'
+                             or vars.quest_type == 'Random Mystery'
+                            )
+                    ) then
+                        if not get_quest_counter_sub_menu() then
+                            vars.close_trigger = true
+                            vars.posting = false
+                            functions.error_handler("Can't post chosen quest type.")
+                        end
+
+                        actions.select_sub_menu = false
+                    elseif (
+                            current_menu ~= 0
+                            and current_menu ~= 30
+                            or (
+                                current_menu == 30
+                                and methods.is_open_select:call(singletons.guiman)
+                            )
+                    ) then
                         if not methods.is_open_select:call(singletons.guiman) then
                             vars.decide_trigger = true
-                        elseif config.current.auto_quest.send_join_request
-                        and actions.select_option
-                        and methods.is_open_select:call(singletons.guiman)
-                        and methods.is_internet:call(nil) then
+                        elseif (
+                                config.current.auto_quest.send_join_request
+                                and actions.select_option
+                                and methods.is_open_select:call(singletons.guiman)
+                                and methods.is_internet:call(nil)
+                        ) then
                             select_index_selection_window(1)
                             actions.select_option = false
                         elseif not methods.is_internet:call(nil) then
                             vars.decide_trigger = true
                         end
-                    elseif current_menu == 30
-                    and actions.select_mystery then
+                    elseif current_menu == 30 and actions.select_mystery then
                         select_mystery_quest()
                         actions.select_mystery = false
                     end

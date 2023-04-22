@@ -208,9 +208,13 @@ function config_menu.draw()
                         if changed then random_changed = true end
                         changed,config.current.randomizer.exclude_anomaly_8 = imgui.checkbox('A8', config.current.randomizer.exclude_anomaly_8)
                         if changed then random_changed = true end
+                        changed,config.current.randomizer.exclude_anomaly_9 = imgui.checkbox('A9', config.current.randomizer.exclude_anomaly_9)
+                        if changed then random_changed = true end
                         imgui.tree_pop()
                     end
                 end
+                changed,config.current.randomizer.exclude_special_investigations = imgui.checkbox('Exclude Special Investigations', config.current.randomizer.exclude_special_investigations)
+                if changed then random_changed = true end
                 changed,config.current.randomizer.exclude_anomaly_investigations = imgui.checkbox('Exclude Anomaly Investigations', config.current.randomizer.exclude_anomaly_investigations)
                 if changed then random_changed = true end
                 if not config.current.randomizer.exclude_anomaly_investigations then
@@ -393,6 +397,13 @@ function config_menu.draw()
             imgui.text(
                     'After loading custom quests press Reload Quest Data button\n'..
                     'for them to appear in the randomizer quest pool.'
+                    )
+            imgui.tree_pop()
+        end
+        if imgui.tree_node('Special Investigations') then
+            imgui.text(
+                    'If you want to post Special version of Anomaly Investigation quest\n' ..
+                    'append an "S" to its quest id. Eg. 700012 -> 700012S'
                     )
             imgui.tree_pop()
         end

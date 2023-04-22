@@ -49,19 +49,27 @@ function common_hooks.hook()
         end
     )
 
-	sdk.hook(methods.quest_activate,function(args)end,
-	    function(retval)
-	        config.current.auto_quest.quest_no = singletons.questman:get_field('_QuestIdentifier'):get_field('_QuestNo')
-	    end
+	sdk.hook(methods.quest_activate,
+	    function(args)
+	    	local qi = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager').requestQuestIdentifier
+	    	if vars.posting and config.current.auto_quest.posting_method == 1 then
+	    		if dump.quest_data_list[config.current.auto_quest.quest_no]['category'] == 'Special Random Mystery' then
+	    			qi._IsSpecialRandomMystery = true
+	    			qi._ActiveSpecialRandomQuestLv = 300
+	    		end
+	    	else
+	        	config.current.auto_quest.quest_no = qi._QuestNo .. (qi._IsSpecialRandomMystery and "S" or "")
+	        end
+		end
 	)
 
 	sdk.hook(methods.get_selected_quest,function(args)end,
 	    function(retval)
 	        if vars.posting then
-	        	if config.current.auto_quest.posting_method == 2 and vars.quest_type ~= 'Random Mystery'
+	        	if config.current.auto_quest.posting_method == 2 and (vars.quest_type ~= 'Random Mystery' and vars.quest_type ~= 'Special Random Mystery')
 	        	or config.current.auto_quest.posting_method == 1 then
 		        	if not quest_data then
-		        		quest_data = methods.get_quest_data:call(singletons.questman,sdk.create_int32(config.current.auto_quest.quest_no))
+		        		quest_data = methods.get_quest_data:call(singletons.questman,sdk.create_int32(functions.sanitize_quest_no(config.current.auto_quest.quest_no)))
 		        	end
 		        	return sdk.to_ptr(quest_data)
 		        else
@@ -83,7 +91,7 @@ function common_hooks.hook()
 	    function(args)
 	        mystery_mode.stop = true
 	        if config.current.randomizer.exclude_posted_quests then
-	            config.current.randomizer.posted_quests[tostring(config.current.auto_quest.quest_no)] = 1
+	            config.current.randomizer.posted_quests[config.current.auto_quest.quest_no] = 1
 	        end
 	    end
 	)
@@ -121,11 +129,11 @@ function common_hooks.hook()
 					randomizer.filter_quests()
 				end
 
-				local no = tonumber(config.current.auto_quest.quest_no)
+				local no = config.current.auto_quest.quest_no
 
 		        if dump.ed and no and dump.quest_data_list[no] then
 		            if not dump.quest_data_list[no]['completed'] then
-		                dump.quest_data_list[no]['completed'] = methods.is_quest_clear:call(singletons.progquestman,no)
+		                dump.quest_data_list[no]['completed'] = methods.is_quest_clear:call(singletons.progquestman, functions.sanitize_quest_no(no))
 		            end
 		        end
 		        if config.current.auto_quest.anomaly_investigation_cap_max_lvl then
