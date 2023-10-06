@@ -583,7 +583,7 @@ function quest_board.hook()
     re.on_frame(function()
         if config.current.auto_quest.posting_method == 3 and config.current.auto_quest.join_multi_type == 1 then
             if auto_join.trigger then
-                auto_join.current = auto.current + methods.get_delta_time:call(nil)
+                auto_join.current = auto_join.current + methods.get_delta_time:call(nil)
                 if auto_join.current >= auto_join.min then
                     if check_posted_quests() then
                         auto_join.current = 0
