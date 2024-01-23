@@ -2,7 +2,6 @@ local randomizer = {}
 local dump
 local config
 local functions
-local methods
 
 randomizer.filtered_quest_list = {}
 randomizer.research_request = {}
@@ -134,7 +133,6 @@ function randomizer.init()
     dump = require("AutoQuest.dump")
     config = require("AutoQuest.config")
     functions = require("AutoQuest.Common.functions")
-    methods = require("AutoQuest.methods")
 end
 
 return randomizer

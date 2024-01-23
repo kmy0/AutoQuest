@@ -3,7 +3,6 @@ local bind = {}
 local config
 local singletons
 local methods
-local config_menu
 local vars
 
 bind.timer_max = 5000
@@ -526,7 +525,6 @@ end
 function bind.init()
 	singletons = require("AutoQuest.singletons")
 	config = require("AutoQuest.config")
-	config_menu = require("AutoQuest.config_menu")
 	methods = require("AutoQuest.methods")
 	vars = require("AutoQuest.Common.vars")
 	bind.hook()

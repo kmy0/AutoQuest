@@ -1,8 +1,6 @@
 local dump = {}
 local singletons
-local vars
 local methods
-local config
 local functions
 
 
@@ -279,10 +277,8 @@ end
 
 function dump.init()
     singletons = require("AutoQuest.singletons")
-    vars = require("AutoQuest.Common.vars")
     methods = require("AutoQuest.methods")
     functions = require("AutoQuest.Common.functions")
-    config = require("AutoQuest.config")
     dump.load()
 end
 

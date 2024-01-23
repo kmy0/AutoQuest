@@ -1,7 +1,6 @@
 local functions = {}
 local methods
 local config
-local vars
 -- local native_config_menu
 local singletons
 
@@ -131,7 +130,6 @@ function functions.init()
 	singletons = require("AutoQuest.singletons")
 	methods = require("AutoQuest.methods")
 	config = require("AutoQuest.config")
-	vars = require("AutoQuest.Common.vars")
     -- native_config_menu = require("AutoQuest.native_config_menu")
 end
 
