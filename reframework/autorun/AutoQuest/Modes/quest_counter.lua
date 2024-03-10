@@ -329,7 +329,11 @@ function quest_counter.hook()
                             vars.decide_trigger = true
                         end
                     elseif current_menu == 30 and actions.select_mystery then
-                        select_mystery_quest()
+                        if not select_mystery_quest() then
+                            vars.close_trigger = true
+                            vars.posting = false
+                            functions.error_handler("Invalid Quest ID.")
+                        end
                         actions.select_mystery = false
                     end
                 end

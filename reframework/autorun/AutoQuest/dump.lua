@@ -183,7 +183,7 @@ function dump.random_mystery()
             quest_data[no .. 'S'] = {data=quest,category='Special Random Mystery'}
         end
     end
-    for i=0,120 do
+    for i=0,200 do
         dump.quest_data_list[tostring(700000 + i)] = nil
         dump.quest_data_list[(700000 + i) .. 'S'] = nil
     end
