@@ -51,17 +51,18 @@ function common_hooks.hook()
 
 	sdk.hook(methods.quest_activate,
 	    function(args)
-	    	if vars.posting and config.current.auto_quest.posting_method ~= 3 then
-		    	local qi = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager').requestQuestIdentifier
-		    	if config.current.auto_quest.posting_method == 1 then
-		    		if dump.quest_data_list[config.current.auto_quest.quest_no]['category'] == 'Special Random Mystery' then
-		    			qi._IsSpecialRandomMystery = true
-		    			qi._ActiveSpecialRandomQuestLv = 300
-		    		end
-		    	else
-		        	config.current.auto_quest.quest_no = qi._QuestNo .. (qi._IsSpecialRandomMystery and "S" or "")
-		        end
-		    end
+			if config.current.auto_quest.posting_method ~= 3 then
+				local qi = sdk.get_managed_singleton('snow.gui.fsm.questcounter.GuiQuestCounterFsmManager').requestQuestIdentifier
+				if (
+					vars.posting
+					and config.current.auto_quest.posting_method == 1
+					and dump.quest_data_list[config.current.auto_quest.quest_no]['category'] == 'Special Random Mystery'
+				) then
+					qi._IsSpecialRandomMystery = true
+					qi._ActiveSpecialRandomQuestLv = 300
+				end
+				config.current.auto_quest.quest_no = qi._QuestNo .. (qi._IsSpecialRandomMystery and "S" or "")
+			end
 		end
 	)
 
