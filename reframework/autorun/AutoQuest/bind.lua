@@ -254,7 +254,7 @@ bind.keyboard_keys = {
 	[219] = "[{",
 	[220] = "\\|",
 	[221] = "]}",
-	[222] = "\' \"",
+	[222] = "' \"",
 	[223] = "OEM_8",
 	--[224] = "Reserved",
 	[225] = "OEM Specific 225",
@@ -313,107 +313,113 @@ bind.listen_valid_keys = {
 	[103] = "7",
 	[104] = "8",
 	[105] = "9",
-	[146] = "Numpad Enter" -- OEM Specific 146
+	[146] = "Numpad Enter", -- OEM Specific 146
 }
 
 bind.pad_keys = {
-			-- [1]={
-			-- 	Xbox='DPAD Up',
-			-- 	Nintendo='DPAD Up',
-			-- 	Playstation='DPAD Up'
-			-- },
-			-- [2]={
-			-- 	Xbox='DPAD Down',
-			-- 	Nintendo='DPAD Down',
-			-- 	Playstation='DPAD Down'
-			-- },
-			-- [4]={
-			-- 	Xbox='DPAD Left',
-			-- 	Nintendo='DPAD Left',
-			-- 	Playstation='DPAD Left'
-			-- },
-			-- [8]={
-			-- 	Xbox='DPAD Right',
-			-- 	Nintendo='DPAD Right',
-			-- 	Playstation='DPAD Right'
-			-- },
-			-- [16]={
-			-- 	Xbox='Y',
-			-- 	Nintendo='X',
-			-- 	Playstation='▲'
-			-- },
-			-- [32]={
-			-- 	Xbox='A',
-			-- 	Nintendo='B',
-			-- 	Playstation='X'
-			-- },
-			-- [64]={
-			-- 	Xbox='X',
-			-- 	Nintendo='Y',
-			-- 	Playstation='⬤'
-			-- },
-			-- [128]={
-			-- 	Xbox='B',
-			-- 	Nintendo='A',
-			-- 	Playstation='■'
-			-- },
-			[256]={
-				Xbox='LB',
-				Nintendo='L',
-				Playstation='L1'
-			},
-			[512]={
-				Xbox='LT',
-				Nintendo='ZL',
-				Playstation='L2'
-			},
-			[1024]={
-				Xbox='RB',
-				Nintendo='R',
-				Playstation='R1'
-			},
-			[2048]={
-				Xbox='RT',
-				Nintendo='ZR',
-				Playstation='R2'
-			},
-			[4096]={
-				Xbox='LS',
-				Nintendo='L3',
-				Playstation='LS'
-			},
-			[8192]={
-				Xbox='RS',
-				Nintendo='R3',
-				Playstation='RS'
-			},
-			[16384]={
-				Xbox='View',
-				Nintendo='-',
-				Playstation='Select'
-			},
-			-- [32768]={
-			-- 	Xbox='Menu',
-			-- 	Nintendo='+',
-			-- 	Playstation='Start'
-			-- },
+	-- [1]={
+	-- 	Xbox='DPAD Up',
+	-- 	Nintendo='DPAD Up',
+	-- 	Playstation='DPAD Up'
+	-- },
+	-- [2]={
+	-- 	Xbox='DPAD Down',
+	-- 	Nintendo='DPAD Down',
+	-- 	Playstation='DPAD Down'
+	-- },
+	-- [4]={
+	-- 	Xbox='DPAD Left',
+	-- 	Nintendo='DPAD Left',
+	-- 	Playstation='DPAD Left'
+	-- },
+	-- [8]={
+	-- 	Xbox='DPAD Right',
+	-- 	Nintendo='DPAD Right',
+	-- 	Playstation='DPAD Right'
+	-- },
+	-- [16]={
+	-- 	Xbox='Y',
+	-- 	Nintendo='X',
+	-- 	Playstation='▲'
+	-- },
+	-- [32]={
+	-- 	Xbox='A',
+	-- 	Nintendo='B',
+	-- 	Playstation='X'
+	-- },
+	-- [64]={
+	-- 	Xbox='X',
+	-- 	Nintendo='Y',
+	-- 	Playstation='⬤'
+	-- },
+	-- [128]={
+	-- 	Xbox='B',
+	-- 	Nintendo='A',
+	-- 	Playstation='■'
+	-- },
+	[256] = {
+		Xbox = "LB",
+		Nintendo = "L",
+		Playstation = "L1",
+	},
+	[512] = {
+		Xbox = "LT",
+		Nintendo = "ZL",
+		Playstation = "L2",
+	},
+	[1024] = {
+		Xbox = "RB",
+		Nintendo = "R",
+		Playstation = "R1",
+	},
+	[2048] = {
+		Xbox = "RT",
+		Nintendo = "ZR",
+		Playstation = "R2",
+	},
+	[4096] = {
+		Xbox = "LS",
+		Nintendo = "L3",
+		Playstation = "LS",
+	},
+	[8192] = {
+		Xbox = "RS",
+		Nintendo = "R3",
+		Playstation = "RS",
+	},
+	[16384] = {
+		Xbox = "View",
+		Nintendo = "-",
+		Playstation = "Select",
+	},
+	-- [32768]={
+	-- 	Xbox='Menu',
+	-- 	Nintendo='+',
+	-- 	Playstation='Start'
+	-- },
 }
 
 local function split(inputstr, sep)
-    if sep == nil then
-        sep = "%s"
-    end
-    local t={}
-    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
-      table.insert(t, str)
-    end
-    return t
+	if sep == nil then
+		sep = "%s"
+	end
+	local t = {}
+	for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+		table.insert(t, str)
+	end
+	return t
 end
 
 function bind.hook()
-	sdk.hook(methods.open_hud,function(args) bind.block = false end)
-	sdk.hook(methods.open_all_quest_hud,function(args) bind.block = false end)
-	sdk.hook(methods.close_hud,function(args) bind.block = true end)
+	sdk.hook(methods.open_hud, function(args)
+		bind.block = false
+	end)
+	sdk.hook(methods.open_all_quest_hud, function(args)
+		bind.block = false
+	end)
+	sdk.hook(methods.close_hud, function(args)
+		bind.block = true
+	end)
 end
 
 function bind.register()
@@ -421,7 +427,7 @@ function bind.register()
 		if bind.hard_kb then
 			for key, key_name in pairs(bind.keyboard_keys) do
 				if methods.get_kb_down_btn:call(bind.hard_kb, key) then
-					config.current.button_bind.button_type = 'Keyboard'
+					config.current.button_bind.button_type = "Keyboard"
 					config.current.button_bind.pad_type = nil
 					config.current.button_bind.button = key
 					config.current.button_bind.button_name = key_name
@@ -432,9 +438,9 @@ function bind.register()
 			end
 		end
 		if bind.hard_pad then
-			local btn = bind.hard_pad:get_field('_on')
+			local btn = bind.hard_pad:get_field("_on")
 			if btn ~= 0 and bind.pad_keys[btn] then
-				config.current.button_bind.button_type = 'Pad'
+				config.current.button_bind.button_type = "Pad"
 				config.current.button_bind.button = btn
 				config.current.button_bind.button_name = bind.pad_keys[btn][bind.pad_type]
 				config.save()
@@ -468,54 +474,70 @@ end
 -- end
 
 function bind.update()
-	if singletons.hwkb then bind.hard_kb = singletons.hwkb:get_field("hardKeyboard") end
+	if singletons.hwkb then
+		bind.hard_kb = singletons.hwkb:get_field("hardKeyboard")
+	end
 	if singletons.hwpad then
 		bind.hard_pad = singletons.hwpad:get_field("hard")
 		local pad_type = methods.get_pad_type:call(bind.hard_pad)
 		if pad_type then
-            if pad_type < 10 then
-                bind.pad_type = 'Xbox'
-            elseif pad_type > 15 then
-                bind.pad_type = 'Nintendo'
-            else
-                bind.pad_type = 'Playstation'
-            end
-        else
-            bind.pad_type = 'Xbox'
-        end
+			if pad_type < 10 then
+				bind.pad_type = "Xbox"
+			elseif pad_type > 15 then
+				bind.pad_type = "Nintendo"
+			else
+				bind.pad_type = "Playstation"
+			end
+		else
+			bind.pad_type = "Xbox"
+		end
 	end
 
-    if bind.new_bind_trigger then
-        bind.timer = bind.timer + methods.get_delta_time:call(nil)
-        if bind.timer <= bind.timer_max then
-        	bind.timer_string = split(tostring( (bind.timer_max - bind.timer) / 1000), '.')[1]
-            if bind.register() then bind.timer = 0 end
-        else
-            bind.new_bind_trigger = false
-            config.current.button_bind.button = nil
+	if bind.new_bind_trigger then
+		bind.timer = bind.timer + methods.get_delta_time:call(nil)
+		if bind.timer <= bind.timer_max then
+			bind.timer_string = split(tostring((bind.timer_max - bind.timer) / 1000), ".")[1]
+			if bind.register() then
+				bind.timer = 0
+			end
+		else
+			bind.new_bind_trigger = false
+			config.current.button_bind.button = nil
 			config.current.button_bind.button_name = "None"
 			config.save()
-            bind.timer = 0
-        end
-    else
+			bind.timer = 0
+		end
+	else
 		bind.check()
-    end
+	end
 end
 
 function bind.check()
 	if config.current.button_bind.button then
-		if not vars.posting
-		and vars.game_state == 4
-		and singletons.questman
-		and not bind.block
-		and not methods.is_quest_posted:call(singletons.questman) then
-			if config.current.button_bind.button_type == 'Keyboard' and bind.hard_kb then
-				if methods.check_kb_btn:call(bind.hard_kb,tonumber(config.current.button_bind.button)) then
-	                vars.post_quest_trigger = true
+		if
+			not vars.posting
+			and vars.game_state == 4
+			and singletons.questman
+			and not bind.block
+			and not methods.is_quest_posted:call(singletons.questman)
+		then
+			if config.current.button_bind.button_type == "Keyboard" and bind.hard_kb then
+				if
+					methods.check_kb_btn:call(
+						bind.hard_kb,
+						tonumber(config.current.button_bind.button)
+					)
+				then
+					vars.post_quest_trigger = true
 				end
-			elseif config.current.button_bind.button_type == 'Pad' and bind.hard_pad then
-				if methods.check_pad_btn:call(bind.hard_pad,tonumber(config.current.button_bind.button)) then
-	                vars.post_quest_trigger = true
+			elseif config.current.button_bind.button_type == "Pad" and bind.hard_pad then
+				if
+					methods.check_pad_btn:call(
+						bind.hard_pad,
+						tonumber(config.current.button_bind.button)
+					)
+				then
+					vars.post_quest_trigger = true
 				end
 			end
 		end
