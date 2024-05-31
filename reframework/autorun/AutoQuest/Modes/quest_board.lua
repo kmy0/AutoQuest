@@ -415,6 +415,7 @@ function quest_board.hook()
 		if
 			config.current.auto_quest.posting_method == 3
 			and config.current.auto_quest.join_multi_type == 1
+			and config.current.auto_quest.auto_join
 		then
 			if
 				methods.get_hash_code:call(sdk.to_managed_object(args[3]):get_field("_textId"))
@@ -616,19 +617,18 @@ function quest_board.hook()
 		if
 			config.current.auto_quest.posting_method == 3
 			and config.current.auto_quest.join_multi_type == 1
+			and auto_join.trigger
 		then
-			if auto_join.trigger then
-				auto_join.current = auto_join.current + methods.get_delta_time:call(nil)
-				if auto_join.current >= auto_join.min then
-					if check_posted_quests() then
+			auto_join.current = auto_join.current + methods.get_delta_time:call(nil)
+			if auto_join.current >= auto_join.min then
+				if check_posted_quests() then
+					auto_join.current = 0
+					auto_join.trigger = false
+					vars.post_quest_trigger = true
+				else
+					if auto_join.current >= auto_join.max then
 						auto_join.current = 0
 						auto_join.trigger = false
-						vars.post_quest_trigger = true
-					else
-						if auto_join.current >= auto_join.max then
-							auto_join.current = 0
-							auto_join.trigger = false
-						end
 					end
 				end
 			end
