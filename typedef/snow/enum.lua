@@ -1,0 +1,34 @@
+---@meta
+
+---@class via.Language : System.Enum
+---@class via.hid.KeyboardKey : System.Enum
+
+---@class snow.Pad.Button : System.Enum
+---@class snow.StmInputManager.ActiveDevice : System.Enum
+---@class snow.quest.QuestCategory : System.Enum
+---@class snow.quest.QuestType : System.Enum
+---@class snow.quest.EnemyLv : System.Enum
+---@class snow.quest.QuestLevel : System.Enum
+---@class snow.quest.QuestNo : System.Enum
+---@class snow.enemy.EnemyDef.EmTypes : System.Enum
+---@class snow.data.MysteryTargetQuestCondition : System.Enum
+---@class snow.quest.nRandomMysteryQuest.QuestCheckResult : System.Enum
+---@class snow.quest.QuestText : System.Enum
+---@class snow.QuestMapManager.MapNoType : System.Enum
+---@class snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType : System.Enum
+---@class snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuType : System.Enum
+---@class snow.LobbyFacilityUIManager.SceneId : System.Enum
+---@class snow.gui.GuiCommonSelectWindow.Result : System.Enum
+---@class snow.gui.SnowGuiCommonUtility.BaseBranchValue : System.Enum
+---@class snow.gui.GuiCommonYNInfoWindow.YNInfoUIState : System.Enum
+---@class snow.player.GameStatePlayer : System.Enum
+---@class snow.player.PlayerIndex : System.Enum
+---@class snow.SnowSessionManager.RequestResult : System.Enum
+---@class snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType : System.Enum
+---@class snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState : System.Enum
+---@class snow.data.ContentsIdSystem.ItemId : System.Enum
+---@class snow.player.PlayerWeaponType : System.Enum
+---@class snow.data.ContentsIdSystem.WeaponId : System.Enum
+---@class snow.data.ParamEnum.WeaponModelId : System.Enum
+---@class snow.ai.ServantDefine.ServantId : System.Enum
+---@class snow.NpcDefine.NpcID : System.Enum
