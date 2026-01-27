@@ -41,7 +41,7 @@ function this.update()
         _G._AUTO_QUEST_RELOAD = false
     end
 
-    local playman = s.get("snow.player.PlayerManager") --:getMasterPlayerRequestData()
+    local playman = s.get("snow.player.PlayerManager")
     local master_player_id = playman:getMasterPlayerID()
 
     if master_player_id > player_index_max or master_player_id < player_index_min then
