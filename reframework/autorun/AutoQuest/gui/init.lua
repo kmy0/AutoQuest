@@ -22,7 +22,7 @@ local set = state.set
 ---@class Gui
 local this = {
     window = {
-        flags = 1024 | 1 << 3 | 1 << 4,
+        flags = 1024,
         condition = 2,
     },
     state = state,
