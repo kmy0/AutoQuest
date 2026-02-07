@@ -5,15 +5,13 @@
 
 local config = require("AutoQuest.config.init")
 local data = require("AutoQuest.data.init")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 local simple_json_cache = require("AutoQuest.util.misc.simple_json_cache")
 local util_mod = require("AutoQuest.util.mod.init")
 local util_table = require("AutoQuest.util.misc.table")
 
 local snow_map = data.snow.map
-local snow_enum = data.snow.enum
 local mod_enum = data.mod.enum
-local rl = game_data.reverse_lookup
 
 ---@class Randomizer
 local this = {
@@ -27,7 +25,7 @@ function this.filter_quests()
     this.research_targets = {}
     local config_randomizer = config.current.mod.randomizer
     for quest_no, quest in pairs(snow_map.quest_data) do
-        if quest.type == rl(snow_enum.quest_type, "INVALID") then
+        if quest.type == e.get("snow.quest.QuestType").INVALID then
             goto continue
         end
 
@@ -53,7 +51,7 @@ function this.filter_quests()
             mod_enum.quest_category.SERVANT_REQUEST,
             mod_enum.quest_category.KINGDOM,
             ---@diagnostic disable-next-line: no-unknown
-        }, function(k, v)
+        }, function(_, v)
             return quest.category == v
         end)
 
@@ -61,19 +59,17 @@ function this.filter_quests()
         if
             (
                 config_randomizer.exclude_village
-                and quest.enemy_level == rl(snow_enum.enemy_level, "Village")
+                and quest.enemy_level == e.get("snow.quest.EnemyLv").Village
             )
-            or (config_randomizer.exclude_low_rank and quest.enemy_level == rl(
-                snow_enum.enemy_level,
-                "Low"
-            ))
-            or (config_randomizer.exclude_high_rank and quest.enemy_level == rl(
-                snow_enum.enemy_level,
-                "High"
-            ))
+            or (config_randomizer.exclude_low_rank and quest.enemy_level == e.get(
+                "snow.quest.EnemyLv"
+            ).Low)
+            or (config_randomizer.exclude_high_rank and quest.enemy_level == e.get(
+                "snow.quest.EnemyLv"
+            ).High)
             or (
                 config_randomizer.exclude_master_rank
-                and quest.enemy_level == rl(snow_enum.enemy_level, "Master")
+                and quest.enemy_level == e.get("snow.quest.EnemyLv").Master
                 and not is_mystery
             )
         then
@@ -105,17 +101,14 @@ function this.filter_quests()
         if
             (
                 config_randomizer.exclude_capture
-                and quest.type == rl(snow_enum.quest_type, "CAPTURE")
+                and quest.type == e.get("snow.quest.QuestType").CAPTURE
             )
-            or (config_randomizer.exclude_slay and quest.type == rl(snow_enum.quest_type, "KILL"))
-            or (config_randomizer.exclude_hunt and quest.type == rl(snow_enum.quest_type, "HUNTING"))
-            or (config_randomizer.exclude_boss_rush and quest.type == rl(
-                snow_enum.quest_type,
-                "BOSSRUSH"
-            ))
+            or (config_randomizer.exclude_slay and quest.type == e.get("snow.quest.QuestType").KILL)
+            or (config_randomizer.exclude_hunt and quest.type == e.get("snow.quest.QuestType").HUNTING)
+            or (config_randomizer.exclude_boss_rush and quest.type == e.get("snow.quest.QuestType").BOSSRUSH)
             or (
                 config_randomizer.exclude_gathering
-                and quest.type == rl(snow_enum.quest_type, "COLLECTS")
+                and quest.type == e.get("snow.quest.QuestType").COLLECTS
             )
         then
             goto continue
@@ -127,7 +120,7 @@ function this.filter_quests()
                 quest.category == mod_enum.quest_category.MYSTERY
                 and config_randomizer["exclude_mystery" .. quest.level]
             )
-            or (not is_mystery and quest.enemy_level == rl(snow_enum.enemy_level, "Master") and config_randomizer["exclude_master_rank" .. quest.level])
+            or (not is_mystery and quest.enemy_level == e.get("snow.quest.EnemyLv").Master and config_randomizer["exclude_master_rank" .. quest.level])
             or (
                 (
                     quest.category == mod_enum.quest_category.RANDOM_MYSTERY

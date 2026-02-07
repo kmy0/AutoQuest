@@ -28,14 +28,13 @@ local combo = require("AutoQuest.gui.combo")
 local config = require("AutoQuest.config.init")
 local config_set = require("AutoQuest.util.imgui.config_set")
 local data = require("AutoQuest.data.init")
-local game_data = require("AutoQuest.util.game.data")
 local m = require("AutoQuest.util.ref.methods")
 local s = require("AutoQuest.util.ref.singletons")
 local util_table = require("AutoQuest.util.misc.table")
 
 local snow_map = data.snow.map
 local mod = data.mod
-local rl = game_data.reverse_lookup
+local rl = util_table.reverse_lookup
 
 ---@class GuiState
 local this = {

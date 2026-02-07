@@ -15,17 +15,14 @@
 ---@field is_research_request boolean
 ---@field is_online boolean
 
-local snow_enum = require("AutoQuest.data.snow").enum
-local game_data = require("AutoQuest.util.game.data")
 local mod_enum = require("AutoQuest.data.mod").enum
+local e = require("AutoQuest.util.game.enum")
 local m = require("AutoQuest.util.ref.methods")
 local s = require("AutoQuest.util.ref.singletons")
 local util_game = require("AutoQuest.util.game.init")
 local util_misc = require("AutoQuest.util.misc.init")
 local util_ref = require("AutoQuest.util.ref.init")
 local util_table = require("AutoQuest.util.misc.table")
-
-local rl = game_data.reverse_lookup
 
 local this = {}
 
@@ -58,13 +55,13 @@ local function get_category_data()
     local max = sdk.find_type_definition("snow.quest.QuestLevel"):get_field("EX_MAX"):get_data() --[[@as snow.quest.QuestLevel]]
     local questman = s.get("snow.QuestManager")
 
-    for quest_category, _ in pairs(snow_enum.quest_category) do
+    for _, quest_category in e.iter("snow.quest.QuestCategory") do
         for quest_level = 0, max do
             util_misc.try(function()
                 -- this throws when index is out of range
                 local arr = questman:getQuestNumberArray(quest_category, quest_level)
                 if arr then
-                    util_game.do_something(arr, function(system_array, index, value)
+                    util_game.do_something(arr, function(_, _, value)
                         if value <= 0 then
                             return
                         end
@@ -88,7 +85,7 @@ local function get_event_data()
     local ret = {}
     local event_quests = s.get("snow.QuestManager")._DlQuestData
 
-    util_game.do_something(event_quests._Param, function(system_array, index, value)
+    util_game.do_something(event_quests._Param, function(_, _, value)
         if value._QuestNo <= 0 then
             return
         end
@@ -115,7 +112,7 @@ local function get_arena_data()
         "_Param_MR1",
     }) do
         local params = arena_quest_data:get_field(field_name) --[[@as System.Array<snow.quest.ArenaQuestData.Param>]]
-        util_game.do_something(params, function(system_array, index, value)
+        util_game.do_something(params, function(_, _, value)
             ret[value._QuestNo] = true
         end)
     end
@@ -129,7 +126,7 @@ local function get_random_mystery_data()
     local ret = {}
     local mystery_quests = s.get("snow.QuestManager")._RandomMysteryQuestData
 
-    util_game.do_something(mystery_quests, function(system_array, index, value)
+    util_game.do_something(mystery_quests, function(_, _, value)
         if value._QuestNo <= 0 then
             return
         end
@@ -185,7 +182,7 @@ local function parse_random_mystery_quests()
         quest.level = quest_param._QuestLv
         quest.type = quest_param._QuestType
         quest.category = mod_enum.quest_category.RANDOM_MYSTERY
-        quest.enemy_level = rl(snow_enum.enemy_level, "Master")
+        quest.enemy_level = e.get("snow.quest.EnemyLv").Master
         quest.hunt_type = get_hunt_type(quest_param._HuntTargetNum)
         quest.is_research_request = quest_param:getMainTargetEmType() == request_monster
             and quest.level >= request_level
@@ -239,7 +236,7 @@ local function parse_random_rampage_quests()
     local quest_arr = s.get("snow.QuestManager"):get_HyakuryuQuestDataArray()
     local quest_datas = {}
 
-    util_game.do_something(quest_arr, function(system_array, index, value)
+    util_game.do_something(quest_arr, function(_, _, value)
         local quest_data = util_ref.ctor("snow.quest.QuestData", true)
         quest_data:call(".ctor(snow.quest.HyakuryuQuestData)", value)
 
@@ -261,7 +258,7 @@ local function parse_normal_quests()
     ---@type snow.quest.QuestData[]
     local rampage_quests = {}
 
-    util_game.do_something_dict(quest_dict, function(dict, quest_no, quest_data)
+    util_game.do_something_dict(quest_dict, function(_, quest_no, quest_data)
         if not quest_data then
             return
         end
@@ -269,7 +266,7 @@ local function parse_normal_quests()
         local quest_param = quest_data:get_RawNormal()
         local quest_type = quest_param._QuestType
 
-        if quest_type == rl(snow_enum.quest_type, "HYAKURYU") then
+        if quest_type == e.get("snow.quest.QuestType").HYAKURYU then
             table.insert(rampage_quests, quest_data)
             return
         end
@@ -283,34 +280,34 @@ local function parse_normal_quests()
         if event_quests[quest_no] then
             quest.category = mod_enum.quest_category.EVENT
             quest.is_unlocked = is_high_rank
-                or (not is_high_rank and quest.enemy_level == rl(snow_enum.enemy_level, "Low"))
-        elseif cat == rl(snow_enum.quest_category, "Arena") or arena_quests[quest_no] then
+                or (not is_high_rank and quest.enemy_level == e.get("snow.quest.EnemyLv").Low)
+        elseif cat == e.get("snow.quest.QuestCategory").Arena or arena_quests[quest_no] then
             quest.category = mod_enum.quest_category.ARENA
             quest.is_online = false
-        elseif cat == rl(snow_enum.quest_category, "Mystery") then
+        elseif cat == e.get("snow.quest.QuestCategory").Mystery then
             quest.category = mod_enum.quest_category.MYSTERY
             quest.level = category_data[quest_no].level
-        elseif cat == rl(snow_enum.quest_category, "Kingdom") then
+        elseif cat == e.get("snow.quest.QuestCategory").Kingdom then
             quest.category = mod_enum.quest_category.KINGDOM
             quest.is_online = false
-        elseif cat == rl(snow_enum.quest_category, "ServantRequest") then
+        elseif cat == e.get("snow.quest.QuestCategory").ServantRequest then
             quest.category = mod_enum.quest_category.SERVANT_REQUEST
             quest.is_online = false
-        elseif quest_type == rl(snow_enum.quest_type, "TOUR") then
+        elseif quest_type == e.get("snow.quest.QuestType").TOUR then
             quest.category = mod_enum.quest_category.TOUR
-        elseif quest_type == rl(snow_enum.quest_type, "TRAINING") then
+        elseif quest_type == e.get("snow.quest.QuestType").TRAINING then
             quest.category = mod_enum.quest_category.TRAINING
             quest.is_online = false
         else
             quest.category = mod_enum.quest_category.NORMAL
         end
 
-        if quest.enemy_level == rl(snow_enum.enemy_level, "Village") then
+        if quest.enemy_level == e.get("snow.quest.EnemyLv").Village then
             quest.is_online = false
         end
 
         local target_num = 0
-        util_game.do_something(quest_param._TgtNum, function(system_array, index, value)
+        util_game.do_something(quest_param._TgtNum, function(_, _, value)
             target_num = target_num + value --[[@as integer]]
         end)
 

@@ -3,13 +3,9 @@
 ---@field protected _last_device string
 
 local bind_util = require("AutoQuest.util.game.bind.util")
-local enum = require("AutoQuest.util.game.bind.enum")
-local game_data = require("AutoQuest.util.game.data")
-local snow_misc = require("AutoQuest.util.snow.misc")
+local e = require("AutoQuest.util.game.enum")
 local util_misc = require("AutoQuest.util.misc.util")
 local util_table = require("AutoQuest.util.misc.table")
-
-local rl = game_data.reverse_lookup
 
 ---@class BindListener
 local this = {}
@@ -44,7 +40,8 @@ end
 ---@param bind_base BindBase
 ---@return string
 function this:get_name_ordered(bind_base)
-    local btn_enum = bind_base.device == "KEYBOARD" and enum.kb_btn or enum.pad_btn
+    local btn_enum = bind_base.device == "KEYBOARD" and e.get("via.hid.KeyboardKey")
+        or e.get("snow.Pad.Button")
     ---@type string[]
     local names = {}
     for i = 1, #bind_base.keys do
@@ -53,7 +50,7 @@ function this:get_name_ordered(bind_base)
     end
 
     table.sort(names, function(a, b)
-        return rl(btn_enum, a) < rl(btn_enum, b)
+        return btn_enum[a] < btn_enum[b]
     end)
     return table.concat(names, " + ")
 end
@@ -78,19 +75,20 @@ function this:listen_keyboard()
     local kb = bind_util.get_kb()
     ---@type string[]
     local btn_names = {}
-    local sorted = util_table.sort(util_table.keys(enum.kb_btn))
+    local enum = e.get("via.hid.KeyboardKey")
+    local sorted = util_table.sort(util_table.keys(enum.enum_to_field))
 
     for i = 1, #sorted do
         local index = sorted[i]
 
         if kb:getDown(index) and not util_table.contains(self._bind_base.keys, index) then
             table.insert(self._bind_base.keys, index)
-            table.insert(btn_names, enum.kb_btn[index])
+            table.insert(btn_names, enum[index])
         end
     end
 
     table.sort(btn_names, function(a, b)
-        return rl(enum.kb_btn, a) < rl(enum.kb_btn, b)
+        return enum[a] < enum[b]
     end)
     self:_concat_key_names(btn_names)
     return self._bind_base
@@ -111,15 +109,16 @@ function this:listen_pad()
 
     ---@type string[]
     local btn_names = {}
+    local enum = e.get("snow.Pad.Button")
     for _, bit in pairs(util_misc.extract_bits(btn)) do
-        if enum.pad_btn[bit] and not util_table.contains(self._bind_base.keys, bit) then
-            table.insert(btn_names, enum.pad_btn[bit])
+        if enum[bit] and not util_table.contains(self._bind_base.keys, bit) then
+            table.insert(btn_names, enum[bit])
             table.insert(self._bind_base.keys, bit)
         end
     end
 
     table.sort(btn_names, function(a, b)
-        return rl(enum.pad_btn, a) < rl(enum.pad_btn, b)
+        return enum[a] < enum[b]
     end)
     self:_concat_key_names(btn_names)
     return self._bind_base

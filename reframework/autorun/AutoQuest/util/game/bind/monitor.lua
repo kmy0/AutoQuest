@@ -78,7 +78,7 @@ function this:add_manager(manager)
         actions = {},
     }
 
-    local function on_data_changed(o)
+    local function on_data_changed(_)
         self._all_keys = {
             PAD = {},
             KEYBOARD = {},
@@ -107,7 +107,7 @@ end
 ---@return boolean
 function this:is_held(manager_name, bind)
     if not manager_name then
-        return util_table.any(self.managers, function(key, value)
+        return util_table.any(self.managers, function(_, value)
             return not util_table.empty(value.held.by_key)
         end)
     end
@@ -126,7 +126,7 @@ end
 ---@return boolean
 function this:is_triggered(manager_name, bind)
     if not manager_name then
-        return util_table.any(self.managers, function(key, value)
+        return util_table.any(self.managers, function(_, value)
             return not util_table.empty(value.triggered.by_key)
         end)
     end

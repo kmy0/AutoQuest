@@ -1,15 +1,13 @@
 local bind = require("AutoQuest.bind.init")
 local config = require("AutoQuest.config.init")
 local data = require("AutoQuest.data.init")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 local randomizer = require("AutoQuest.randomizer")
 local routine_post = require("reframework.autorun.AutoQuest.routine_post")
 local s = require("AutoQuest.util.ref.singletons")
 local timer = require("AutoQuest.util.misc.timer")
 
 local snow_map = data.snow.map
-local snow_enum = data.snow.enum
-local rl = game_data.reverse_lookup
 
 local this = {
     ---@type snow.player.GameStatePlayer
@@ -55,15 +53,15 @@ function this.update()
 
     -- whenever game is launched for the first time, player is always in the 'quest' state, which triggers auto post...
     if
-        master_player_state == rl(snow_enum.game_state_player, "Quest")
+        master_player_state == e.get("snow.player.GameStatePlayer").Quest
         and not s.get("snow.QuestManager"):isActiveQuest()
     then
         return
     end
 
     if
-        master_player_state == rl(snow_enum.game_state_player, "Lobby")
-        and this.state == rl(snow_enum.game_state_player, "Quest")
+        master_player_state == e.get("snow.player.GameStatePlayer").Lobby
+        and this.state == e.get("snow.player.GameStatePlayer").Quest
     then
         local progman = s.get("snow.progress.quest.ProgressQuestManager")
         local config_mod = config.current.mod

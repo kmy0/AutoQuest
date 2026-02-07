@@ -11,7 +11,7 @@
 
 local config = require("AutoQuest.config.init")
 local data = require("AutoQuest.data.init")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 local randomizer = require("AutoQuest.randomizer")
 local s = require("AutoQuest.util.ref.singletons")
 local servant = require("AutoQuest.servant")
@@ -20,9 +20,7 @@ local util_mod = require("AutoQuest.util.mod.init")
 local util_ref = require("AutoQuest.util.ref.init")
 
 local snow_map = data.snow.map
-local snow_enum = data.snow.enum
 local mod_enum = data.mod.enum
-local rl = game_data.reverse_lookup
 
 ---@class RoutinePostQuestHolder
 local this = {}
@@ -82,7 +80,7 @@ end
 ---@protected
 function RoutinePostQuest:_open_quest_counter()
     s.get_no_cache("snow.LobbyFacilityUIManager")
-        :activateOnly(rl(snow_enum.facility_ui_type, "QuestCounter"))
+        :activateOnly(e.get("snow.LobbyFacilityUIManager.SceneId").QuestCounter)
     self:_set_state(this.state.START_SESSION_ACTION)
 end
 
@@ -138,7 +136,7 @@ function RoutinePostQuest:_decide_select()
         end
     end
 
-    scroll_ctrl._result = rl(snow_enum.select_result, "Decide")
+    scroll_ctrl._result = e.get("snow.gui.GuiCommonSelectWindow.Result").Decide
     cursor:set_index(index)
     self:_set_state(this.state.WAIT_COMPLETE)
 end
@@ -149,12 +147,15 @@ function RoutinePostQuest:_wait_complete()
 
     if
         s.get("snow.SnowSessionManager"):get_lastRequestResult()
-                == rl(snow_enum.request_result, "Failed")
+                == e.get("snow.SnowSessionManager.RequestResult").Failed
             and not quest_counter
         or ( --FIXME: this completely breaks quest counter routine, it's the only way that I could find in a reasonable amount of time to detect if user canceled matching
             config.current.mod.combo.mode == mod_enum.mod_mode.QUEST_BOARD
             and self._create_session_action._RoutineCtrl.Rno
-                == rl(snow_enum.quest_session_action_state, "WarningStart")
+                == e.get(
+                    "snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState"
+                ).WarningStart
+
         )
     then
         self:_set_state(this.state.ERR)
@@ -162,12 +163,14 @@ function RoutinePostQuest:_wait_complete()
 
     if
         quest_counter
-            and quest_counter:get_BaseBranchValue() == rl(snow_enum.base_branch_value, "SUCCESS")
+            and quest_counter:get_BaseBranchValue() == e.get(
+                "snow.gui.SnowGuiCommonUtility.BaseBranchValue"
+            ).SUCCESS
         or (not quest_counter and config.current.mod.combo.mode == mod_enum.mod_mode.QUEST_BOARD)
     then
         s.get("snow.gui.GuiManager"):set_IsActivateQuestCounterFromQuestBoard(false)
         s.get_no_cache("snow.LobbyFacilityUIManager")
-            :deactivateOnly(rl(snow_enum.facility_ui_type, "QuestCounter"))
+            :deactivateOnly(e.get("snow.LobbyFacilityUIManager.SceneId").QuestCounter)
         self:_set_state(this.state.WAIT_CLOSE)
     end
 end
@@ -297,7 +300,7 @@ function this.clear()
         guiman:closeInfo()
         s.get("snow.gui.GuiManager"):set_IsActivateQuestCounterFromQuestBoard(false)
         s.get_no_cache("snow.LobbyFacilityUIManager")
-            :deactivateOnly(rl(snow_enum.facility_ui_type, "QuestCounter"))
+            :deactivateOnly(e.get("snow.LobbyFacilityUIManager.SceneId").QuestCounter)
         this._instance = nil
     end
 end

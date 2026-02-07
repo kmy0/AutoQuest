@@ -4,7 +4,7 @@ local this = {
 }
 
 local config = require("AutoQuest.config.init")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 ---@class MethodUtil
 local m = require("AutoQuest.util.ref.methods")
 local quest_data = require("AutoQuest.data.quest")
@@ -14,7 +14,6 @@ local util_ref = require("AutoQuest.util.ref.init")
 local util_table = require("AutoQuest.util.misc.table")
 
 local snow_map = this.snow.map
-local snow_enum = this.snow.enum
 
 m.getMessage = m.wrap(m.get("via.gui.message.get(System.Guid, via.Language)")) --[[@as fun(guid: System.Guid, lang: via.Language): System.String]]
 
@@ -33,7 +32,7 @@ function this.get_rampage_quest_data(quest_no)
     ---@type snow.quest.QuestData?
     local ret
 
-    util_game.do_something(quest_arr, function(system_array, index, value)
+    util_game.do_something(quest_arr, function(_, _, value)
         if value._QuestNo == quest_no then
             ret = util_ref.ctor("snow.quest.QuestData", true):add_ref() --[[@as snow.quest.QuestData]]
             ret:call(".ctor(snow.quest.HyakuryuQuestData)", value)
@@ -146,17 +145,13 @@ end
 local function make_weapon_map()
     ---@type table<snow.data.ParamEnum.WeaponModelId, {content_id: snow.data.ContentsIdSystem.WeaponId, player_weapon: snow.player.PlayerWeaponType}>
     local ret = {}
-    ---@type table<snow.data.ContentsIdSystem.WeaponId, string>
-    local weapon_ids = {}
 
     local getModelId =
         m.wrap(m.get("snow.data.DataShortcut.getModelId(snow.data.ContentsIdSystem.WeaponId)")) --[[@as fun(wp_id: snow.data.ContentsIdSystem.WeaponId): snow.data.ParamEnum.WeaponModelId]]
     local getPlWeaponType =
         m.wrap(m.get("snow.data.DataShortcut.getPlWeaponType(snow.data.ContentsIdSystem.WeaponId)")) --[[@as fun(wp_id: snow.data.ContentsIdSystem.WeaponId): snow.player.PlayerWeaponType]]
 
-    game_data.get_enum("snow.data.ContentsIdSystem.WeaponId", weapon_ids)
-
-    for content_id, _ in pairs(weapon_ids) do
+    for _, content_id in pairs(util_game.get_fields("snow.data.ContentsIdSystem.WeaponId")) do
         ret[getModelId(content_id)] = {
             player_weapon = getPlWeaponType(content_id),
             content_id = content_id,
@@ -182,7 +177,7 @@ local function make_servant_data()
     local servant_data = servantman._ServantDataList
     local weapon_map = make_weapon_map()
 
-    util_game.do_something(servant_data._ServantDataList, function(system_array, index, value)
+    util_game.do_something(servant_data._ServantDataList, function(_, _, value)
         local id = value._ServantId
         --FIXME: Surely there exists some easy isValid function?
         if servantman:getServantName(id) == "" then
@@ -244,41 +239,25 @@ function this.init()
         return false
     end
 
-    game_data.get_enum("snow.quest.QuestCategory", snow_enum.quest_category)
-    game_data.get_enum("snow.quest.QuestType", snow_enum.quest_type)
-    game_data.get_enum("snow.quest.EnemyLv", snow_enum.enemy_level)
-    game_data.get_enum("snow.quest.QuestText", snow_enum.quest_text)
-    game_data.get_enum(
-        "snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType",
-        snow_enum.quest_counter_type
-    )
-    game_data.get_enum(
-        "snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuType",
-        snow_enum.quest_counter_sub_menu_type
-    )
-    game_data.get_enum("snow.LobbyFacilityUIManager.SceneId", snow_enum.facility_ui_type)
-    game_data.get_enum("snow.gui.GuiCommonSelectWindow.Result", snow_enum.select_result)
-    game_data.get_enum("snow.gui.SnowGuiCommonUtility.BaseBranchValue", snow_enum.base_branch_value)
-    game_data.get_enum("snow.gui.GuiCommonYNInfoWindow.YNInfoUIState", snow_enum.yn_ui_state)
-    game_data.get_enum("snow.player.GameStatePlayer", snow_enum.game_state_player)
-    game_data.get_enum("snow.SnowSessionManager.RequestResult", snow_enum.request_result)
-    game_data.get_enum(
-        "snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType",
-        snow_enum.quest_counter_top_menu_type
-    )
-    game_data.get_enum(
-        "snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState",
-        snow_enum.quest_session_action_state
-    )
+    e.new("snow.quest.QuestCategory", function(key, _)
+        return key ~= "Min"
+    end)
+    e.new("snow.quest.QuestType")
+    e.new("snow.quest.EnemyLv")
+    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType")
+    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuType")
+    e.new("snow.LobbyFacilityUIManager.SceneId")
+    e.new("snow.gui.GuiCommonSelectWindow.Result")
+    e.new("snow.gui.SnowGuiCommonUtility.BaseBranchValue")
+    e.new("snow.gui.GuiCommonYNInfoWindow.YNInfoUIState")
+    e.new("snow.player.GameStatePlayer")
+    e.new("snow.SnowSessionManager.RequestResult")
+    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType")
+    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState")
 
-    if
-        util_table.any(
-            this.snow.enum --[[@as table<string, table<integer, string>>]],
-            function(key, value)
-                return util_table.empty(value)
-            end
-        )
-    then
+    if util_table.any(e.enums, function(_, value)
+        return not value.ok
+    end) then
         return false
     end
 

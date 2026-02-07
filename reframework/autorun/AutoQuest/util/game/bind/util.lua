@@ -1,6 +1,5 @@
 local cache = require("AutoQuest.util.misc.cache")
-local enum = require("AutoQuest.util.game.bind.enum")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 local s = require("AutoQuest.util.ref.singletons")
 
 local this = {}
@@ -8,7 +7,9 @@ local this = {}
 ---@return "KEYBOARD" | "PAD"
 function this.get_input_device()
     local active_device = s.get("snow.StmInputManager")._ActiveDevice
-    return enum.input_device[active_device._ActiveDevice] == "Pad" and "PAD" or "KEYBOARD"
+    return e.get("snow.StmInputManager.ActiveDevice")[active_device._ActiveDevice] == "Pad"
+            and "PAD"
+        or "KEYBOARD"
 end
 
 ---@return snow.Pad.Device

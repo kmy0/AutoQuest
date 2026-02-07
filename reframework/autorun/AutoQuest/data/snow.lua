@@ -1,22 +1,5 @@
 ---@class (exact) SnowData
----@field enum SnowEnum
 ---@field map SnowMap
-
----@class (exact) SnowEnum
----@field quest_category table<snow.quest.QuestCategory, string>
----@field quest_type table<snow.quest.QuestType, string>
----@field enemy_level table<snow.quest.EnemyLv, string>
----@field quest_text table<snow.quest.QuestText, string>
----@field quest_counter_type table<snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType, string>
----@field quest_counter_sub_menu_type table<snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuType, string>
----@field facility_ui_type table<snow.LobbyFacilityUIManager.SceneId, string>
----@field select_result table<snow.gui.GuiCommonSelectWindow.Result, string>
----@field base_branch_value table<snow.gui.SnowGuiCommonUtility.BaseBranchValue, string>
----@field yn_ui_state table<snow.gui.GuiCommonYNInfoWindow.YNInfoUIState, string>
----@field game_state_player table<snow.player.GameStatePlayer, string>
----@field request_result table<snow.SnowSessionManager.RequestResult, string>
----@field quest_counter_top_menu_type table<snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType, string>
----@field quest_session_action_state table<snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState, string>
 
 ---@class (exact) SnowMap
 ---@field quest_data table<string, Quest>
@@ -40,22 +23,6 @@
 
 ---@class SnowData
 local this = {
-    enum = {
-        quest_category = {},
-        quest_type = {},
-        enemy_level = {},
-        quest_text = {},
-        quest_counter_type = {},
-        quest_counter_sub_menu_type = {},
-        facility_ui_type = {},
-        select_result = {},
-        base_branch_value = {},
-        yn_ui_state = {},
-        game_state_player = {},
-        request_result = {},
-        quest_counter_top_menu_type = {},
-        quest_session_action_state = {},
-    },
     map = {
         quest_data = {},
         default_quest_no = {},

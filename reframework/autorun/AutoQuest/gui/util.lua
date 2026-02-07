@@ -1,11 +1,9 @@
 local config = require("AutoQuest.config.init")
 local data = require("AutoQuest.data.init")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 local util_misc = require("AutoQuest.util.misc.init")
 
-local snow = data.snow
 local mod = data.mod
-local rl = game_data.reverse_lookup
 
 local this = {}
 
@@ -110,13 +108,13 @@ function this.format_quest_level(quest)
 
         if quest.category == mod.enum.quest_category.MYSTERY then
             ret = ret .. config.lang:tr("misc.text_mystery_short")
-        elseif quest.enemy_level == rl(snow.enum.enemy_level, "Village") then
+        elseif quest.enemy_level == e.get("snow.quest.EnemyLv").Village then
             ret = ret .. config.lang:tr("misc.text_village_short")
-        elseif quest.enemy_level == rl(snow.enum.enemy_level, "Low") then
+        elseif quest.enemy_level == e.get("snow.quest.EnemyLv").Low then
             ret = ret .. config.lang:tr("misc.text_low_rank_short")
-        elseif quest.enemy_level == rl(snow.enum.enemy_level, "High") then
+        elseif quest.enemy_level == e.get("snow.quest.EnemyLv").High then
             ret = ret .. config.lang:tr("misc.text_high_rank_short")
-        elseif quest.enemy_level == rl(snow.enum.enemy_level, "Master") then
+        elseif quest.enemy_level == e.get("snow.quest.EnemyLv").Master then
             ret = ret .. config.lang:tr("misc.text_master_rank_short")
         end
 

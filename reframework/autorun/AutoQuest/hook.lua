@@ -1,6 +1,6 @@
 local config = require("AutoQuest.config.init")
 local data = require("AutoQuest.data.init")
-local game_data = require("AutoQuest.util.game.data")
+local e = require("AutoQuest.util.game.enum")
 local gui_state = require("AutoQuest.gui.state")
 local randomizer = require("AutoQuest.randomizer")
 local routine_post = require("reframework.autorun.AutoQuest.routine_post")
@@ -8,18 +8,16 @@ local s = require("AutoQuest.util.ref.singletons")
 local util_ref = require("AutoQuest.util.ref.init")
 local util_table = require("AutoQuest.util.misc.table")
 
-local snow_enum = data.snow.enum
 local mod_enum = data.mod.enum
-local rl = game_data.reverse_lookup
 
 local this = {}
 
-function this.quest_activate_post(retval)
+function this.quest_activate_post(_)
     local qi = s.get("snow.QuestManager")._QuestIdentifier
     config.current.mod.quest_id = tostring(qi._QuestNo)
 end
 
-function this.get_selected_quest_post(retval)
+function this.get_selected_quest_post(_)
     if routine_post.has_instance() then
         local quest = routine_post.get_quest()
         if quest.category == mod_enum.quest_category.RANDOM_RAMPAGE then
@@ -30,13 +28,13 @@ function this.get_selected_quest_post(retval)
     end
 end
 
-function this.ret_true_post(retval)
+function this.ret_true_post(_)
     if routine_post.has_instance() then
         return true
     end
 end
 
-function this.skip_func_pre(args)
+function this.skip_func_pre(_)
     if routine_post.has_instance() then
         return sdk.PreHookResult.SKIP_ORIGINAL
     end
@@ -57,7 +55,9 @@ function this.set_quest_counter_type_pre(args)
             )
         end
 
-        quest_counter:set_QuestCounterType(rl(snow_enum.quest_counter_type, "HallCounter"))
+        quest_counter:set_QuestCounterType(
+            e.get("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType").HallCounter
+        )
     end
 end
 
@@ -65,9 +65,10 @@ function this.quest_counter_sub_menu_check_pre(args)
     if routine_post.has_instance() then
         local quest = routine_post.get_quest()
         local type = util_ref.to_int(args[3])
-        local is_type_special = type
-            == rl(snow_enum.quest_counter_sub_menu_type, "Special_Random_Mystery")
-        local is_type_random = type == rl(snow_enum.quest_counter_sub_menu_type, "Random_Mystery")
+        local enum =
+            e.get("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuTyp")
+        local is_type_special = type == enum.Special_Random_Mystery
+        local is_type_random = type == enum.Random_Mystery
 
         local mode = config.current.mod.combo.mode
         local quest_board_quest = config.current.mod.combo.quest
@@ -88,8 +89,7 @@ function this.quest_counter_sub_menu_check_pre(args)
             and (
                 (quest_board_quest == enum_quest.RANDOM_SPECIAL_RANDOM_MYSTERY and is_type_special)
                 or (quest_board_quest == enum_quest.RANDOM_RANDOM_MYSTERY and is_type_random)
-                or quest_board_quest == enum_quest.RANDOM_RAMPAGE
-                    and type == rl(snow_enum.quest_counter_sub_menu_type, "Hyakuryu")
+                or quest_board_quest == enum_quest.RANDOM_RAMPAGE and type == enum.Hyakuryu
             )
         then
             ---@diagnostic disable-next-line: no-unknown
@@ -98,16 +98,16 @@ function this.quest_counter_sub_menu_check_pre(args)
     end
 end
 
-function this.update_yn_post(retval)
+function this.update_yn_post(_)
     if
         routine_post.has_instance()
         and config.current.mod.combo.mode == mod_enum.mod_mode.QUEST_COUNTER
     then
-        return rl(snow_enum.yn_ui_state, "Yes_on")
+        return e.get("snow.gui.GuiCommonYNInfoWindow.YNInfoUIState").Yes_on
     end
 end
 
-function this.force_decide_post(retval)
+function this.force_decide_post(_)
     --[[
         FIXME: update_yn_post instantly cancels the yn window when the quest board is open, but works fine when the quest counter is open.
         Manual clicking or this workaround works perfectly fine...
@@ -121,18 +121,18 @@ function this.force_decide_post(retval)
     end
 end
 
-function this.quest_start_pre(args)
+function this.quest_start_pre(_)
     randomizer.posted_quests:set(config.current.mod.quest_id, true)
     randomizer.posted_quests:dump()
 end
 
-function this.skip_sound_pre(args)
+function this.skip_sound_pre(_)
     if routine_post.has_instance() then
         return sdk.PreHookResult.SKIP_ORIGINAL
     end
 end
 
-function this.quick_quest_post(retval)
+function this.quick_quest_post(_)
     if
         routine_post.has_instance()
         and config.current.mod.combo.mode == mod_enum.mod_mode.QUEST_BOARD
@@ -151,27 +151,28 @@ function this.quick_quest_post(retval)
             return
         end
 
-        local enum_top = snow_enum.quest_counter_top_menu_type
+        local enum_top =
+            e.get("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType")
         if random == enum_quest.RANDOM_LOW_RANK then
-            return rl(enum_top, "Normal_Hall_Low")
+            return enum_top.Normal_Hall_Low
         elseif random == enum_quest.RANDOM_HIGH_RANK then
-            return rl(enum_top, "Normal_Hall_High")
+            return enum_top.Normal_Hall_High
         elseif random == enum_quest.RANDOM_MASTER_RANK then
-            return rl(enum_top, "Normal_Hall_Master")
+            return enum_top.Normal_Hall_Master
         elseif random == enum_quest.RANDOM_MYSTERY then
-            return rl(enum_top, "Mystery")
+            return enum_top.Mystery
         end
     end
 end
 
-function this.thread_ret_post(retval)
+function this.thread_ret_post(_)
     local ret = thread.get_hook_storage()["ret"] --[[@as boolean?]]
     if ret ~= nil then
         return ret
     end
 end
 
-function this.get_rampage_target_post(retval)
+function this.get_rampage_target_post(_)
     local config_combo = config.current.mod.combo
     if routine_post.has_instance() and config_combo.mode == mod_enum.mod_mode.QUEST_BOARD then
         if config_combo.quest == mod_enum.quest_board_quest.RANDOM_RAMPAGE then
@@ -185,7 +186,7 @@ function this.get_rampage_target_post(retval)
     end
 end
 
-function this.get_random_mystery_lv_min_post(retval)
+function this.get_random_mystery_lv_min_post(_)
     local config_mod = config.current.mod
     local config_combo = config_mod.combo
     if
@@ -197,7 +198,7 @@ function this.get_random_mystery_lv_min_post(retval)
     end
 end
 
-function this.get_random_mystery_lv_max_post(retval)
+function this.get_random_mystery_lv_max_post(_)
     local config_mod = config.current.mod
     local config_combo = config_mod.combo
     if
@@ -209,7 +210,7 @@ function this.get_random_mystery_lv_max_post(retval)
     end
 end
 
-function this.get_random_mystery_item_post(retval)
+function this.get_random_mystery_item_post(_)
     local config_combo = config.current.mod.combo
     if routine_post.has_instance() and config_combo.mode == mod_enum.mod_mode.QUEST_BOARD then
         if
