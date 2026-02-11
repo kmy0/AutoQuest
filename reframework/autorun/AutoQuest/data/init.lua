@@ -239,25 +239,27 @@ function this.init()
         return false
     end
 
-    e.new("snow.quest.QuestCategory", function(key, _)
-        return key ~= "Min"
-    end)
-    e.new("snow.quest.QuestType")
-    e.new("snow.quest.EnemyLv")
-    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType")
-    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuType")
-    e.new("snow.LobbyFacilityUIManager.SceneId")
-    e.new("snow.gui.GuiCommonSelectWindow.Result")
-    e.new("snow.gui.SnowGuiCommonUtility.BaseBranchValue")
-    e.new("snow.gui.GuiCommonYNInfoWindow.YNInfoUIState")
-    e.new("snow.player.GameStatePlayer")
-    e.new("snow.SnowSessionManager.RequestResult")
-    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType")
-    e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState")
-
-    if util_table.any(e.enums, function(_, value)
-        return not value.ok
-    end) then
+    if
+        not e.wrap_init(function()
+            e.new("snow.quest.QuestCategory", function(key, _)
+                return key ~= "Min"
+            end)
+            e.new("snow.quest.QuestType")
+            e.new("snow.quest.EnemyLv")
+            e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterAccessType")
+            e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterSubMenuType")
+            e.new("snow.LobbyFacilityUIManager.SceneId")
+            e.new("snow.gui.GuiCommonSelectWindow.Result")
+            e.new("snow.gui.SnowGuiCommonUtility.BaseBranchValue")
+            e.new("snow.gui.GuiCommonYNInfoWindow.YNInfoUIState")
+            e.new("snow.player.GameStatePlayer")
+            e.new("snow.SnowSessionManager.RequestResult")
+            e.new("snow.gui.fsm.questcounter.GuiQuestCounterFsmManager.QuestCounterTopMenuType")
+            e.new(
+                "snow.gui.fsm.questcounter.GuiQuestCounterFsmCreateQuestSessionAction.AutoMatichState"
+            )
+        end)
+    then
         return false
     end
 
