@@ -404,7 +404,6 @@ function this:monitor()
     end
 
     if self.key_buffer.frame == self._buffer_max then
-        print("re")
         self:_resolve_buffer()
     end
 
