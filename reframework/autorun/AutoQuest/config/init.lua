@@ -10,8 +10,8 @@
 ---@field name string
 ---
 ---@field hud_default_path string
----@field option_default_path string
----@field default_config_path string
+---@field posted_quests_path string
+---@field quest_no_path string
 ---
 ---@field grid_size integer
 ---@field porter_timeout number
