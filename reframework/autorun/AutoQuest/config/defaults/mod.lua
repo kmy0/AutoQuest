@@ -5,6 +5,7 @@
 ---@class (exact) ModLanguage
 ---@field file string
 ---@field fallback boolean
+---@field font_size integer
 
 ---@class (exact) RandomizerSettings
 ---@field exclude_village boolean
@@ -107,6 +108,7 @@ return {
         lang = {
             file = "en-us",
             fallback = true,
+            font_size = 16,
         },
         quest_id = "",
         enable_key_binds = true,
