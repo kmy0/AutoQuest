@@ -7,12 +7,13 @@ local util = require("AutoQuest.util.init")
 local logger = util.misc.logger.g
 local bind = require("AutoQuest.bind.init")
 local hook = require("AutoQuest.hook")
+local init_chain = require("AutoQuest.config.init_chain")
 local randomizer = require("AutoQuest.randomizer")
 local routine_post = require("reframework.autorun.AutoQuest.routine_post")
 local s = require("AutoQuest.util.ref.singletons")
 local update = require("AutoQuest.update")
 
-local init = util.misc.init_chain:new(
+local init = init_chain:new(
     "MAIN",
     config.init,
     data.init,
@@ -119,6 +120,10 @@ re.on_draw_ui(function()
     else
         imgui.same_line()
         imgui.text_colored("Init failed!", config_menu.state.colors.bad)
+        local errors = logger:get_last_error()
+        if errors then
+            util.imgui.tooltip_exclamation(errors)
+        end
     end
 end)
 
